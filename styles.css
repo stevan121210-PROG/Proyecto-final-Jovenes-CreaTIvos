@@ -1,0 +1,158 @@
+/* Estilos base para toda la página */
+:root {
+  --color-bg: #000000;
+  --color-text: #ffffff;
+  --color-accent: #c49a4f;
+  --color-accent-light: #e2c785;
+  --color-muted: #d9d9d9;
+  --font-family: "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(1120px, 100% - 2rem);
+  margin: 0 auto;
+}
+
+/* Estilos del encabezado */
+.site-header {
+  padding: 1rem 0;
+}
+
+.header-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo img {
+  width: 240px;
+  height: auto;
+}
+
+.main-nav ul {
+  justify-content: center;
+}
+
+.main-nav ul {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.main-nav a {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.main-nav a:hover {
+  color: var(--color-accent);
+}
+
+/* Sección Hero */
+.hero {
+  min-height: calc(100vh - 90px);
+  display: grid;
+  place-items: center;
+  padding: 3rem 0;
+}
+
+.hero-inner {
+  text-align: center;
+  max-width: 720px;
+}
+
+.hero-label {
+  color: var(--color-accent);
+  font-size: 0.95rem;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  margin-bottom: 1rem;
+}
+
+.hero-text {
+  color: var(--color-muted);
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.95rem 2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--color-text);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover {
+  background: rgba(196, 154, 79, 0.12);
+}
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .main-nav ul {
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .hero {
+    padding: 2rem 0;
+  }
+}
