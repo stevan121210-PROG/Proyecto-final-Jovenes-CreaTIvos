@@ -190,11 +190,57 @@ a {
     color: var(--color-muted);
     line-height: 1.7;
   }
+
+.catalog-card.special-offer {
+  border-color: rgba(196, 154, 79, 0.5);
+  background: rgba(196, 154, 79, 0.12);
+}
+
+.catalog-card.special-offer .precio {
+  color: #000000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.catalog-card.special-offer h3 {
+  color: var(--color-accent);
+}
+
+.catalog-card.special-offer .catalog-cta {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.btn-secondary:hover {
+  background: rgba(196, 154, 79, 0.12);
+}
+
+.btn-golden {
+  background: linear-gradient(135deg, #c49a4f 0%, #e2c785 100%);
+  color: #000000;
+  box-shadow: 0 15px 30px rgba(196, 154, 79, 0.18);
+}
+
+.btn-golden:hover {
+  background: linear-gradient(135deg, #ddb86b 0%, #f1d59b 100%);
+}
+
+.hero h1,
+.page-header h1 {
+  color: var(--color-accent);
+}
+
+.form-row select,
+.form-row option {
+  background: rgba(255, 255, 255, 0.08);
   color: var(--color-text);
 }
 
-..btn-secondary:hover {
-  background: rgba(196, 154, 79, 0.12);
+.form-row select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 /* Estilos del catálogo de servicios */
@@ -277,6 +323,97 @@ a {
 
 .ai-asistencia .btn {
   display: inline-flex;
+}
+
+.contacto-page {
+  margin-top: 3rem;
+  padding: 3rem 0;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 2rem;
+}
+
+.contact-info {
+  padding: 2rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contact-info h2 {
+  margin-bottom: 1rem;
+}
+
+.contact-info a {
+  display: inline-block;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+.contact-note {
+  margin-top: 1rem;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+.contact-form {
+  padding: 2rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-row label {
+  font-size: 0.95rem;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+}
+
+.form-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-text) 50%),
+    linear-gradient(135deg, var(--color-text) 50%, transparent 50%);
+  background-position: calc(100% - 1rem) calc(50% - 0.35rem), calc(100% - 0.5rem) calc(50% - 0.35rem);
+  background-size: 0.45rem 0.45rem, 0.45rem 0.45rem;
+  background-repeat: no-repeat;
+}
+
+.form-row option {
+  background: #101010;
+  color: var(--color-text);
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.form-feedback {
+  color: var(--color-accent);
+  min-height: 1.25rem;
 }
 
 /* Estilos responsive */

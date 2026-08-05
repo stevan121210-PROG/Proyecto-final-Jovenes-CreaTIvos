@@ -44,6 +44,59 @@
       </p>
       <a href="#" class="btn btn-primary">Consultar con IA</a>
     </section>
+
+    <section class="container contacto-page">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>Contacto directo</h2>
+          <p>Teléfono / WhatsApp</p>
+          <a href="https://wa.me/573027473875" target="_blank" rel="noreferrer">+57 302 747 3875</a>
+          <p>Correo electrónico</p>
+          <a href="mailto:Stevan121210@gmail.com">Stevan121210@gmail.com</a>
+          <p class="contact-note">
+            Completa el formulario para solicitar una cotización o describir tu requerimiento.
+            Incluye el tipo de servicio si ya sabes qué plan te interesa.
+          </p>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-row">
+            <label for="nombre">Nombre completo</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required />
+          </div>
+
+          <div class="form-row">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" required />
+          </div>
+
+          <div class="form-row">
+            <label for="telefono">Teléfono / WhatsApp (opcional)</label>
+            <input type="tel" id="telefono" name="telefono" placeholder="+57 321 1234567" />
+          </div>
+
+          <div class="form-row">
+            <label for="servicio">Tipo de servicio</label>
+            <select id="servicio" name="servicio">
+              <option value="">Seleccione un plan</option>
+              <option value="Landing Page">Landing Page</option>
+              <option value="Sitio Corporativo">Sitio Corporativo</option>
+              <option value="Descuento especial Landing">Descuento especial Landing</option>
+              <option value="E-commerce">E-commerce</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="mensaje">Mensaje o detalle del requerimiento</label>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos qué necesitas" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+          <p class="form-feedback" id="form-feedback"></p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <script src="../js/servicios.js"></script>

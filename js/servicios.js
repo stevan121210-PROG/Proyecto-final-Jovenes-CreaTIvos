@@ -2,7 +2,7 @@
 const paquetes = [
   {
     nombre: "Landing Page",
-    precio: "Desde $450.000 CLP",
+    precio: "Desde $2.200.000 COP (aprox. USD 550)",
     caracteristicas: [
       "Diseño responsive para móviles y escritorio",
       "Sección de contacto con formulario",
@@ -13,7 +13,7 @@ const paquetes = [
   },
   {
     nombre: "Sitio Corporativo",
-    precio: "Desde $950.000 CLP",
+    precio: "Desde $4.500.000 COP (aprox. USD 1.125)",
     caracteristicas: [
       "Múltiples secciones de servicios y equipo",
       "Blog o noticias empresariales",
@@ -23,8 +23,19 @@ const paquetes = [
     observacion: "Perfecto para empresas que necesitan una presencia digital sólida y escalable."
   },
   {
+    nombre: "Descuento especial Landing",
+    precio: "40% de descuento en tu siguiente proyecto",
+    caracteristicas: [
+      "Contrata una Landing Page hoy",
+      "Recibe 40% de descuento en tu próximo proyecto",
+      "Ideal para fidelizar clientes empresariales",
+      "Oferta válida para proyectos posteriores con ProgramStyle"
+    ],
+    observacion: "Promoción exclusiva: primero una Landing Page y luego un gran ahorro en el siguiente desarrollo."
+  },
+  {
     nombre: "E-commerce",
-    precio: "Desde $1.600.000 CLP",
+    precio: "Desde $7.500.000 COP (aprox. USD 1.875)",
     caracteristicas: [
       "Catálogo de productos con filtros",
       "Pasarela de pago y carrito de compras",
@@ -77,4 +88,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const tarjeta = crearTarjeta(paquete);
     catalogoContainer.appendChild(tarjeta);
   });
+
+  const form = document.getElementById("contact-form");
+  const feedback = document.getElementById("form-feedback");
+
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const servicio = document.getElementById("servicio").value;
+      const mensaje = document.getElementById("mensaje").value.trim();
+
+      if (!nombre || !email || !mensaje) {
+        feedback.textContent = "Por favor completa los campos obligatorios.";
+        return;
+      }
+
+      if (!validarEmail(email)) {
+        feedback.textContent = "Ingresa un correo electrónico válido.";
+        return;
+      }
+
+      feedback.textContent = "Solicitud enviada. Pronto nos pondremos en contacto contigo.";
+      form.reset();
+
+      // Aquí puedes extender la lógica para enviar los datos a un servidor.
+      console.log({ nombre, email, telefono, servicio, mensaje });
+    });
+  }
 });
+
+function validarEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
