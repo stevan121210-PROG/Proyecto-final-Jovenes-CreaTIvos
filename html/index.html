@@ -12,12 +12,7 @@
   <!-- Encabezado principal con logo y navegación -->
   <header class="site-header">
     <div class="container header-inner">
-      <!-- Logo de la marca cargado desde assets, centrado en el encabezado -->
-      <a href="#inicio" class="brand-logo">
-        <img src="../assets/logo-ProgramStyle_centrado.png" alt="Logo ProgramStyle" />
-      </a>
-
-      <!-- Barra de navegacion principal -->
+      <!-- Barra de navegacion principal sobre el logo -->
       <nav class="main-nav">
         <ul>
           <li><a href="index.html">Inicio</a></li>
@@ -25,6 +20,11 @@
           <li><a href="admin.html">Admin</a></li>
         </ul>
       </nav>
+
+      <!-- Logo de la marca cargado desde assets, centrado en el encabezado -->
+      <a href="#inicio" class="brand-logo">
+        <img src="../assets/logo-ProgramStyle_centrado.png" alt="Logo ProgramStyle" />
+      </a>
     </div>
   </header>
 
@@ -43,6 +43,37 @@
         <div class="hero-actions">
           <a href="servicios.html" class="btn btn-primary">Ver servicios</a>
           <a href="admin.html" class="btn btn-secondary">Panel admin</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de proyectos realizados en el home -->
+    <section class="proyectos" id="proyectos">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-label">Proyectos realizados</p>
+          <h2>Casos de éxito recientes</h2>
+          <p class="section-description">
+            Ejemplos de páginas empresariales entregadas por ProgramStyle. Haz clic en cada proyecto para ver el sitio en vivo.
+          </p>
+        </div>
+
+        <div class="project-grid">
+          <a href="https://shinsushii.vercel.app/" target="_blank" rel="noreferrer" class="project-card">
+            <img src="../assets/img/Shinsushii_referencia.png" alt="Shinsushii proyecto web" />
+            <div class="project-info">
+              <h3>Shinsushii</h3>
+              <p>Landing web elegante para marca de sushi con enfoque visual y navegación fluida.</p>
+            </div>
+          </a>
+
+          <a href="https://smphcompresores.vercel.app/" target="_blank" rel="noreferrer" class="project-card">
+            <img src="../assets/img/SMPH_Industrial_referencia.png" alt="SMPH Compresores proyecto web" />
+            <div class="project-info">
+              <h3>SMPH Compresores</h3>
+              <p>Sitio corporativo industrial con enfoque en confianza, servicios y contacto rápido.</p>
+            </div>
+          </a>
         </div>
       </div>
     </section>
