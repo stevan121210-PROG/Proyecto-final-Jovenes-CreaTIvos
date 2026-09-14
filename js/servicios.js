@@ -46,8 +46,33 @@ const paquetes = [
   }
 ];
 
+const WHATSAPP_NUMERO = "573027473875";
+const EMAIL_CONTACTO = "Stevan121210@gmail.com";
+
 // Selecciona el contenedor donde se dibujarán las tarjetas del catálogo.
 const catalogoContainer = document.getElementById("catalogo-container");
+
+function crearMensajeWhatsApp({ nombre, email, telefono, servicio, mensaje }) {
+  const resumen = [
+    "Hola, quiero solicitar una cotización.",
+    `Nombre: ${nombre}`,
+    `Correo: ${email}`,
+    telefono ? `Teléfono: ${telefono}` : "Teléfono: No indicado",
+    servicio ? `Servicio: ${servicio}` : "Servicio: No especificado",
+    `Mensaje: ${mensaje}`
+  ].join("\n");
+
+  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(resumen)}`;
+}
+
+function crearMensajeCorreo({ nombre, email, telefono, servicio, mensaje }) {
+  const asunto = encodeURIComponent("Solicitud de cotización ProgramStyle");
+  const cuerpo = encodeURIComponent(
+    `Nombre: ${nombre}\nCorreo: ${email}\nTeléfono: ${telefono || "No indicado"}\nServicio: ${servicio || "No especificado"}\n\nMensaje:\n${mensaje}`
+  );
+
+  return `mailto:${EMAIL_CONTACTO}?subject=${asunto}&body=${cuerpo}`;
+}
 
 // Función para crear cada tarjeta de servicio dinámicamente.
 function crearTarjeta(paquete) {
@@ -91,6 +116,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const form = document.getElementById("contact-form");
   const feedback = document.getElementById("form-feedback");
+  const iaButton = document.getElementById("consultar-ia-btn");
+  const iaPanel = document.getElementById("ia-panel");
+
+  if (iaButton && iaPanel) {
+    iaButton.addEventListener("click", () => {
+      iaPanel.classList.toggle("visible");
+    });
+
+    iaPanel.querySelectorAll(".ai-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const prompt = button.dataset.prompt || "Necesito asesoría para un proyecto web.";
+        const iaLink = crearMensajeWhatsApp({
+          nombre: "Cliente con consulta por IA",
+          email: "sin-email@consulta.com",
+          telefono: "",
+          servicio: "Asesoría con IA",
+          mensaje: prompt
+        });
+
+        window.open(iaLink, "_blank", "noopener,noreferrer");
+        feedback.textContent = "Consulta IA enviada por WhatsApp. También puedes escribirnos por correo.";
+        feedback.classList.remove("error");
+        feedback.classList.add("success");
+        iaPanel.classList.remove("visible");
+      });
+    });
+  }
 
   if (form) {
     form.addEventListener("submit", (event) => {
@@ -102,21 +154,38 @@ document.addEventListener("DOMContentLoaded", () => {
       const servicio = document.getElementById("servicio").value;
       const mensaje = document.getElementById("mensaje").value.trim();
 
+      const mensajeError = (texto) => {
+        feedback.classList.remove("success");
+        feedback.classList.add("error");
+        feedback.textContent = texto;
+      };
+
+      const mensajeExito = (texto) => {
+        feedback.classList.remove("error");
+        feedback.classList.add("success");
+        feedback.textContent = texto;
+      };
+
       if (!nombre || !email || !mensaje) {
-        feedback.textContent = "Por favor completa los campos obligatorios.";
+        mensajeError("Por favor completa los campos obligatorios.");
         return;
       }
 
       if (!validarEmail(email)) {
-        feedback.textContent = "Ingresa un correo electrónico válido.";
+        mensajeError("Ingresa un correo electrónico válido.");
         return;
       }
 
-      feedback.textContent = "Solicitud enviada. Pronto nos pondremos en contacto contigo.";
+      const whatsappLink = crearMensajeWhatsApp({ nombre, email, telefono, servicio, mensaje });
+      const correoLink = crearMensajeCorreo({ nombre, email, telefono, servicio, mensaje });
+
+      mensajeExito("Solicitud enviada. Te estamos contactando por WhatsApp y correo.");
       form.reset();
 
-      // Aquí puedes extender la lógica para enviar los datos a un servidor.
-      console.log({ nombre, email, telefono, servicio, mensaje });
+      window.open(whatsappLink, "_blank", "noopener,noreferrer");
+      window.location.href = correoLink;
+
+      console.log({ nombre, email, telefono, servicio, mensaje, whatsappLink, correoLink });
     });
   }
 });

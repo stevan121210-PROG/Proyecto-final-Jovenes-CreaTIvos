@@ -39,10 +39,19 @@
     <section class="container ai-asistencia">
       <h2>Asistencia con IA</h2>
       <p>
-        Aquí se activará el chatbot de ayuda para recibir asesoría, cotizaciones personalizadas y recomendaciones.
+        Recibe orientación rápida sobre el tipo de proyecto, presupuesto estimado y la mejor opción para tu negocio.
         Este servicio puede requerir detalles adicionales según el alcance del proyecto.
       </p>
-      <a href="#" class="btn btn-primary">Consultar con IA</a>
+      <button type="button" class="btn btn-primary" id="consultar-ia-btn">Consultar con IA</button>
+
+      <div class="ai-panel" id="ia-panel" aria-live="polite">
+        <p class="ai-panel-title">Selecciona una consulta rápida:</p>
+        <div class="ai-options">
+          <button type="button" class="ai-option" data-prompt="Necesito una Landing Page para presentar mi negocio y captar clientes por WhatsApp.">Landing Page</button>
+          <button type="button" class="ai-option" data-prompt="Quiero un sitio corporativo para mi empresa con secciones de servicios, proyectos y contacto.">Sitio corporativo</button>
+          <button type="button" class="ai-option" data-prompt="Necesito un ecommerce para vender productos online con catálogo y pagos seguros.">E-commerce</button>
+        </div>
+      </div>
     </section>
 
     <section class="container contacto-page">
@@ -62,22 +71,22 @@
         <form id="contact-form" class="contact-form" novalidate>
           <div class="form-row">
             <label for="nombre">Nombre completo</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required />
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required aria-label="Nombre completo" />
           </div>
 
           <div class="form-row">
             <label for="email">Correo electrónico</label>
-            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" required />
+            <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" required aria-label="Correo electrónico" />
           </div>
 
           <div class="form-row">
             <label for="telefono">Teléfono / WhatsApp (opcional)</label>
-            <input type="tel" id="telefono" name="telefono" placeholder="+57 321 1234567" />
+            <input type="tel" id="telefono" name="telefono" placeholder="+57 321 1234567" aria-label="Teléfono o WhatsApp" />
           </div>
 
           <div class="form-row">
             <label for="servicio">Tipo de servicio</label>
-            <select id="servicio" name="servicio">
+            <select id="servicio" name="servicio" aria-label="Tipo de servicio">
               <option value="">Seleccione un plan</option>
               <option value="Landing Page">Landing Page</option>
               <option value="Sitio Corporativo">Sitio Corporativo</option>
@@ -89,11 +98,11 @@
 
           <div class="form-row">
             <label for="mensaje">Mensaje o detalle del requerimiento</label>
-            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos qué necesitas" required></textarea>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos qué necesitas" required aria-label="Mensaje o detalle del requerimiento"></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary">Enviar solicitud</button>
-          <p class="form-feedback" id="form-feedback"></p>
+          <p class="form-feedback" id="form-feedback" aria-live="polite"></p>
         </form>
       </div>
     </section>
