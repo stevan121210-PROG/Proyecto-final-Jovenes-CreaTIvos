@@ -58,21 +58,91 @@
           <p>Sesión activa</p>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid admin-quick-grid">
           <article class="dashboard-card">
             <h3>Solicitudes</h3>
-            <p>Revisa los formularios enviados por clientes y cotizaciones pendientes.</p>
+            <p>Revisa formularios enviados, cotizaciones y mensajes de contacto.</p>
           </article>
 
           <article class="dashboard-card">
             <h3>Servicios</h3>
-            <p>Actualiza planes, precios y promociones del catálogo de ProgramStyle.</p>
+            <p>Actualiza planes, precios y promociones del catálogo actual.</p>
           </article>
 
           <article class="dashboard-card">
             <h3>Clientes</h3>
-            <p>Gestiona conversaciones, seguimiento y contactos recibidos por WhatsApp.</p>
+            <p>Gestiona seguimiento, atención y conversaciones por WhatsApp.</p>
           </article>
+        </div>
+
+        <div class="admin-sections">
+          <section class="panel-section">
+            <button type="button" class="panel-toggle" data-target="create-admin-panel">
+              Agregar nuevo administrador
+            </button>
+
+            <div id="create-admin-panel" class="panel-content hidden-panel">
+              <form id="create-admin-form" class="panel-form" novalidate>
+                <div class="input-row">
+                  <label for="new-admin-user">Usuario</label>
+                  <input type="text" id="new-admin-user" placeholder="nuevo-admin" required />
+                </div>
+
+                <div class="input-row">
+                  <label for="new-admin-pass">Contraseña</label>
+                  <input type="password" id="new-admin-pass" placeholder="••••••••" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Crear perfil</button>
+                <p id="create-admin-message" class="panel-message" aria-live="polite"></p>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <button type="button" class="panel-toggle" data-target="edit-admin-panel">
+              Editar credenciales
+            </button>
+
+            <div id="edit-admin-panel" class="panel-content hidden-panel">
+              <form id="edit-admin-form" class="panel-form" novalidate>
+                <div class="input-row">
+                  <label for="current-admin-user">Usuario actual</label>
+                  <input type="text" id="current-admin-user" placeholder="admin" required />
+                </div>
+
+                <div class="input-row">
+                  <label for="current-admin-pass">Contraseña actual</label>
+                  <input type="password" id="current-admin-pass" placeholder="••••••••" required />
+                </div>
+
+                <div class="input-row">
+                  <label for="updated-admin-user">Nuevo usuario</label>
+                  <input type="text" id="updated-admin-user" placeholder="nuevo-usuario" required />
+                </div>
+
+                <div class="input-row">
+                  <label for="updated-admin-pass">Nueva contraseña</label>
+                  <input type="password" id="updated-admin-pass" placeholder="••••••••" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <p id="edit-admin-message" class="panel-message" aria-live="polite"></p>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h3>Sesiones</h3>
+            <div id="session-list" class="session-list" aria-live="polite"></div>
+
+            <div class="session-actions">
+              <button type="button" class="btn btn-secondary" id="logout-current-btn">Cerrar sesión actual</button>
+              <button type="button" class="btn btn-secondary" id="clear-unauthorized-btn">Cerrar sesiones no autorizadas</button>
+            </div>
+
+            <p id="session-message" class="panel-message" aria-live="polite"></p>
+          </section>
         </div>
       </section>
     </div>

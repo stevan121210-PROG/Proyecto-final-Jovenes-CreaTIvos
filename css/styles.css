@@ -524,6 +524,128 @@ textarea {
   line-height: 1.7;
 }
 
+.admin-quick-grid {
+  margin-bottom: 1.5rem;
+}
+
+.admin-sections {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.panel-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 1.5rem;
+}
+
+.panel-section h3 {
+  margin-bottom: 1rem;
+  color: var(--color-accent);
+}
+
+.panel-toggle {
+  width: 100%;
+  text-align: left;
+  background: rgba(196, 154, 79, 0.12);
+  color: var(--color-text);
+  border: 1px solid rgba(196, 154, 79, 0.4);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.panel-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(196, 154, 79, 0.8);
+  background: rgba(196, 154, 79, 0.18);
+}
+
+.panel-content {
+  margin-top: 1rem;
+}
+
+.hidden-panel {
+  display: none;
+}
+
+.panel-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel-message {
+  min-height: 1.25rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.panel-message.error {
+  color: #ffb1b1;
+}
+
+.panel-message.success {
+  color: #9de6ad;
+}
+
+.session-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.session-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(196, 154, 79, 0.7);
+  background: rgba(196, 154, 79, 0.08);
+}
+
+.session-item.selected {
+  border-color: rgba(196, 154, 79, 0.9);
+  background: rgba(196, 154, 79, 0.12);
+}
+
+.session-item .badge {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08rem;
+}
+
+.badge.active {
+  background: rgba(122, 245, 159, 0.15);
+  color: #a6f7bc;
+}
+
+.badge.unauthorized {
+  background: rgba(255, 153, 153, 0.12);
+  color: #ffb1b1;
+}
+
+.session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .ai-option {
   padding: 0.8rem 1rem;
   border: 1px solid rgba(196, 154, 79, 0.45);
