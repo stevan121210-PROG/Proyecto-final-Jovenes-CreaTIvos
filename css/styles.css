@@ -397,6 +397,133 @@ textarea {
   gap: 0.75rem;
 }
 
+.admin-page {
+  padding-top: 2rem;
+}
+
+.admin-shell {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+}
+
+.auth-card,
+.admin-dashboard {
+  width: min(100%, 640px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.auth-header {
+  margin-bottom: 1.5rem;
+}
+
+.auth-header h1,
+.dashboard-header h2 {
+  color: var(--color-text);
+  margin-top: 0.5rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.input-row {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.input-row label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.input-row input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+}
+
+.input-row input:focus {
+  outline: none;
+  border-color: rgba(196, 154, 79, 0.9);
+  box-shadow: 0 0 0 3px rgba(196, 154, 79, 0.15);
+}
+
+.auth-alert {
+  min-height: 1.25rem;
+  color: #ffb1b1;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+.auth-alert.success {
+  color: #9de6ad;
+}
+
+.hidden {
+  display: none;
+}
+
+.admin-dashboard {
+  display: none;
+}
+
+.admin-dashboard.visible {
+  display: block;
+}
+
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(196, 154, 79, 0.12);
+  border: 1px solid rgba(196, 154, 79, 0.4);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  margin: 1.25rem 0 1.5rem;
+  color: var(--color-text);
+}
+
+.status-dot {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #7af59f;
+  box-shadow: 0 0 10px rgba(122, 245, 159, 0.8);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.25rem;
+}
+
+.dashboard-card h3 {
+  margin-bottom: 0.7rem;
+  color: var(--color-accent);
+}
+
+.dashboard-card p {
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
 .ai-option {
   padding: 0.8rem 1rem;
   border: 1px solid rgba(196, 154, 79, 0.45);

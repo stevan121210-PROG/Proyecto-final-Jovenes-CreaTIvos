@@ -23,11 +23,61 @@
     </div>
   </header>
 
-  <main class="catalogo-page">
-    <div class="container page-header">
-      <h1>Administración</h1>
-      <p>Aquí se cargará el login y el panel de control cuando la sección esté lista.</p>
+  <main class="catalogo-page admin-page">
+    <div class="container admin-shell">
+      <section class="auth-card" id="login-section">
+        <div class="auth-header">
+          <p class="section-label">Acceso restringido</p>
+          <h1>Iniciar sesión</h1>
+        </div>
+
+        <form id="admin-login-form" class="auth-form" novalidate>
+          <div class="input-row">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" name="usuario" placeholder="admin" required />
+          </div>
+
+          <div class="input-row">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Ingresar</button>
+          <p id="login-error" class="auth-alert" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="admin-dashboard" class="admin-dashboard hidden" aria-live="polite">
+        <div class="dashboard-header">
+          <p class="section-label">Panel de control</p>
+          <h2>Bienvenido, administrador</h2>
+        </div>
+
+        <div class="admin-status">
+          <span class="status-dot"></span>
+          <p>Sesión activa</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="dashboard-card">
+            <h3>Solicitudes</h3>
+            <p>Revisa los formularios enviados por clientes y cotizaciones pendientes.</p>
+          </article>
+
+          <article class="dashboard-card">
+            <h3>Servicios</h3>
+            <p>Actualiza planes, precios y promociones del catálogo de ProgramStyle.</p>
+          </article>
+
+          <article class="dashboard-card">
+            <h3>Clientes</h3>
+            <p>Gestiona conversaciones, seguimiento y contactos recibidos por WhatsApp.</p>
+          </article>
+        </div>
+      </section>
     </div>
   </main>
+
+  <script src="../js/admin.js"></script>
 </body>
 </html>
