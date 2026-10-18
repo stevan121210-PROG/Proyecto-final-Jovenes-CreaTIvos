@@ -60,7 +60,7 @@ function crearTarjeta(paquete) {
   const boton = document.createElement("a");
   boton.href = "#contact-form";
   boton.className = "btn btn-secondary catalog-cta";
-  boton.textContent = serviceContent.quoteButtonLabel;
+  boton.textContent = serviceContent.quoteButtonLabel || "Cotizar este plan";
   boton.addEventListener("click", () => {
     document.getElementById("servicio").value = paquete.nombre;
   });

@@ -134,16 +134,24 @@ const ADMIN_HELP_TOPICS = [
     priority: -3,
     keywords: ["servicios", "catalogo", "paquetes", "planes", "que ofrecen", "ver servicios", "tipos de sitio"],
     responses: [
-      "En “Servicios” encontrarás cuatro opciones: Landing Page, Sitio Corporativo, una promoción para un proyecto posterior y E-commerce. Hay precios de referencia y puedes pedir una cotización desde esa página.",
-      "La página “Servicios” reúne Landing Page, Sitio Corporativo, E-commerce y una promoción especial. Si me cuentas qué tipo de negocio o página tienes en mente, te ayudo a ubicar el plan que más se parece."
+      "En “Servicios” encontrarás los planes de desarrollo y mantenimiento. Hay precios de referencia y puedes pedir una cotización desde esa página.",
+      "La página “Servicios” reúne opciones para crear sitios y mantenerlos. Si me cuentas qué tipo de proyecto tienes, te ayudo a ubicar el plan que más se parece."
+    ]
+  },
+  {
+    id: "service-maintenance",
+    keywords: ["mantenimiento web", "mantenimiento de pagina", "mantenimiento de sitio", "mantener mi pagina", "mantener el sitio", "descuento mantenimiento", "descuento del 10%", "10% de descuento"],
+    responses: [
+      "Sí, añadimos el plan “Mantenimiento Web”. Tiene cotización personalizada y ofrece 10% de descuento si el sitio que se mantiene —Landing Page, Sitio Corporativo o E-commerce— fue desarrollado por ProgramStyle.",
+      "El mantenimiento web ya aparece en Servicios. El 10% de descuento aplica únicamente si la Landing Page, el Sitio Corporativo o el E-commerce fue creado por ProgramStyle; el precio se define por cotización."
     ]
   },
   {
     id: "service-discount",
-    keywords: ["descuento", "promocion", "40%", "oferta"],
+    keywords: ["descuento", "promocion", "25%", "oferta"],
     responses: [
-      "En “Servicios” aparece una promoción de 40% de descuento para un proyecto posterior, después de contratar una Landing Page. La descripción la presenta como una oferta para proyectos posteriores con ProgramStyle; confirma las condiciones al cotizar.",
-      "La promoción publicada es 40% de descuento en el siguiente proyecto al contratar primero una Landing Page. Como los precios y condiciones pueden variar, lo mejor es confirmarlo al solicitar la cotización."
+      "En “Servicios” aparece una promoción de 25% de descuento para un proyecto posterior, después de contratar una Landing Page. La descripción la presenta como una oferta para proyectos posteriores con ProgramStyle; confirma las condiciones al cotizar.",
+      "La promoción publicada es 25% de descuento en el siguiente proyecto al contratar primero una Landing Page. Como los precios y condiciones pueden variar, lo mejor es confirmarlo al solicitar la cotización."
     ]
   },
   {
@@ -151,32 +159,32 @@ const ADMIN_HELP_TOPICS = [
     priority: 8,
     keywords: ["precio", "precios", "cuanto cuesta", "cuanto vale", "presupuesto", "valor de", "dolares", "pesos"],
     responses: [
-      "Los valores que aparecen en “Servicios” son sugeridos: Landing Page desde $2.200.000 COP (aprox. USD 550), sitio corporativo desde $4.500.000 COP (aprox. USD 1.125) y e-commerce desde $7.500.000 COP (aprox. USD 1.875). Pueden variar según alcance, urgencia e integraciones.",
-      "Como referencia, el catálogo publica estos precios iniciales: Landing Page $2.200.000 COP, sitio corporativo $4.500.000 COP y e-commerce $7.500.000 COP. Son aproximados y pueden cambiar según el proyecto; en la página Servicios puedes pedir una cotización."
+      "En “Servicios” se publican estos precios: Landing Page $1.500.000 COP, Sitio Corporativo $4.300.000 COP, E-commerce $3.000.000 COP y Mantenimiento Web $350.000 COP. Puedes pedir una cotización desde esa página.",
+      "Los precios actuales del catálogo son: Landing Page $1.500.000 COP, Sitio Corporativo $4.300.000 COP, E-commerce $3.000.000 COP y Mantenimiento Web $350.000 COP."
     ]
   },
   {
     id: "service-landing",
     keywords: ["landing", "pagina de aterrizaje", "pagina para captar clientes"],
     responses: [
-      "La Landing Page está pensada para presentar un negocio y captar clientes. Incluye diseño adaptable, formulario de contacto, SEO básico e integración con WhatsApp; figura desde $2.200.000 COP.",
-      "Si buscas una página enfocada en una sola propuesta y en conseguir contactos, la Landing Page puede encajar. El plan menciona diseño responsive, contacto, SEO básico y WhatsApp, desde $2.200.000 COP."
+      "La Landing Page está pensada para presentar un negocio y captar clientes. Incluye diseño adaptable, formulario de contacto, SEO básico e integración con WhatsApp; cuesta $1.500.000 COP.",
+      "Si buscas una página enfocada en una sola propuesta y en conseguir contactos, la Landing Page puede encajar. El plan menciona diseño responsive, contacto, SEO básico y WhatsApp, por $1.500.000 COP."
     ]
   },
   {
     id: "service-corporate",
     keywords: ["corporativo", "sitio empresarial", "pagina empresarial", "empresa", "blog", "equipo"],
     responses: [
-      "El Sitio Corporativo es para una empresa que necesita varias secciones, por ejemplo servicios, equipo y noticias. Incluye SEO avanzado y un panel de administración básico; está publicado desde $4.500.000 COP.",
-      "Para una presencia empresarial más completa, el plan corporativo contempla varias secciones, blog o noticias, SEO avanzado y un panel Admin básico. El precio de referencia empieza en $4.500.000 COP."
+      "El Sitio Corporativo es para una empresa que necesita varias secciones, por ejemplo servicios, equipo y noticias. Incluye SEO avanzado y un panel de administración básico; cuesta $4.300.000 COP.",
+      "Para una presencia empresarial más completa, el plan corporativo contempla varias secciones, blog o noticias, SEO avanzado y un panel Admin básico. Su precio es $4.300.000 COP."
     ]
   },
   {
     id: "service-ecommerce",
     keywords: ["ecommerce", "e-commerce", "tienda online", "tienda en linea", "carrito", "pasarela de pago", "vender productos"],
     responses: [
-      "Para vender en línea está el plan E-commerce: incluye catálogo con filtros, carrito y pasarela de pago, gestión de stock y seguimiento de pedidos. Se publica desde $7.500.000 COP; el alcance final se cotiza según lo que necesites.",
-      "El E-commerce es la opción de tienda en línea. El catálogo menciona productos con filtros, pagos, carrito, inventario y seguimiento de pedidos, desde $7.500.000 COP."
+      "Para vender en línea está el plan E-commerce: incluye catálogo con filtros, carrito y pasarela de pago, gestión de stock y seguimiento de pedidos. Cuesta $3.000.000 COP.",
+      "El E-commerce es la opción de tienda en línea. El catálogo menciona productos con filtros, pagos, carrito, inventario y seguimiento de pedidos, por $3.000.000 COP."
     ]
   },
   {
@@ -611,6 +619,13 @@ function getDynamicAdminHelpResponse(topic) {
   if (topic.id === "service-overview") {
     const names = packages.map(({ name }) => name).join(", ");
     return `En Servicios tienes estas opciones: ${names}. Puedes editar sus datos desde “Preparar un cambio del sitio”; los cambios solo se aplican tras confirmarlos.`;
+  }
+
+  if (topic.id === "service-maintenance") {
+    const plan = packages.find(({ name }) => normaliseChatText(name).includes("mantenimiento"));
+    if (plan) {
+      return `${plan.name}: ${plan.price}. ${plan.observation} Incluye: ${plan.features.join("; ")}.`;
+    }
   }
 
   const packageIndexByTopic = {

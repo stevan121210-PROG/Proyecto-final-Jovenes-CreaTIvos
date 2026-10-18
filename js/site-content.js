@@ -33,7 +33,7 @@
       packages: [
         {
           name: "Landing Page",
-          price: "Desde $2.200.000 COP (aprox. USD 550)",
+          price: "$1.500.000 COP",
           features: [
             "Diseño responsive para móviles y escritorio",
             "Sección de contacto con formulario",
@@ -44,7 +44,7 @@
         },
         {
           name: "Sitio Corporativo",
-          price: "Desde $4.500.000 COP (aprox. USD 1.125)",
+          price: "$4.300.000 COP",
           features: [
             "Múltiples secciones de servicios y equipo",
             "Blog o noticias empresariales",
@@ -55,18 +55,17 @@
         },
         {
           name: "Descuento especial Landing",
-          price: "40% de descuento en tu siguiente proyecto",
+          price: "25% de descuento en tu siguiente proyecto",
           features: [
             "Contrata una Landing Page hoy",
-            "Recibe 40% de descuento en tu próximo proyecto",
-            "Ideal para fidelizar clientes empresariales",
+            "Recibe 25% de descuento en tu próximo proyecto",
             "Oferta válida para proyectos posteriores con ProgramStyle"
           ],
           observation: "Promoción exclusiva: primero una Landing Page y luego un gran ahorro en el siguiente desarrollo."
         },
         {
           name: "E-commerce",
-          price: "Desde $7.500.000 COP (aprox. USD 1.875)",
+          price: "$3.000.000 COP",
           features: [
             "Catálogo de productos con filtros",
             "Pasarela de pago y carrito de compras",
@@ -74,6 +73,16 @@
             "Optimización orientada a conversión"
           ],
           observation: "Para tiendas en línea que desean vender de forma profesional y segura."
+        },
+        {
+          name: "Mantenimiento Web",
+          price: "$350.000 COP",
+          features: [
+            "Mantenimiento de páginas web desarrolladas por ProgramStyle",
+            "10% de descuento en el mantenimiento de una Landing Page, Sitio Corporativo o E-commerce creado por nosotros",
+            "Alcance y frecuencia del mantenimiento definidos según las necesidades del sitio"
+          ],
+          observation: "El descuento del 10% aplica únicamente al mantenimiento de una Landing Page, Sitio Corporativo o E-commerce desarrollado por ProgramStyle. Solicita una cotización para definir el alcance."
         }
       ],
       aiTitle: "Asistencia con IA",
@@ -120,7 +129,46 @@
 
   function get() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : clone(DEFAULT_CONTENT);
+    if (!saved) return clone(DEFAULT_CONTENT);
+
+    const content = JSON.parse(saved);
+    if (!content.services.quoteButtonLabel || !content.services.quoteButtonLabel.trim()) {
+      content.services.quoteButtonLabel = DEFAULT_CONTENT.services.quoteButtonLabel;
+    }
+
+    const priceUpdates = {
+      "Landing Page": ["Desde $2.200.000 COP (aprox. USD 550)", "$1.500.000 COP"],
+      "Sitio Corporativo": ["Desde $4.500.000 COP (aprox. USD 1.125)", "$4.300.000 COP"],
+      "E-commerce": ["Desde $7.500.000 COP (aprox. USD 1.875)", "$3.000.000 COP"],
+      "Mantenimiento Web": ["Cotización personalizada", "$350.000 COP"]
+    };
+    content.services.packages.forEach((plan) => {
+      const update = priceUpdates[plan.name];
+      if (update && plan.price === update[0]) {
+        plan.price = update[1];
+      }
+    });
+
+    const discountPlan = content.services.packages.find((plan) => plan.name === "Descuento especial Landing");
+    if (discountPlan) {
+      discountPlan.features = discountPlan.features.filter((feature) => feature !== "Ideal para fidelizar clientes empresariales");
+      if (discountPlan.price === "40% de descuento en tu siguiente proyecto") {
+        discountPlan.price = "25% de descuento en tu siguiente proyecto";
+      }
+      discountPlan.features = discountPlan.features.map((feature) =>
+        feature === "Recibe 40% de descuento en tu próximo proyecto"
+          ? "Recibe 25% de descuento en tu próximo proyecto"
+          : feature
+      );
+    }
+
+    const defaultMaintenancePlan = DEFAULT_CONTENT.services.packages.find((plan) => plan.name === "Mantenimiento Web");
+    const maintenancePlanExists = content.services.packages.some((plan) => plan.name === defaultMaintenancePlan.name);
+    if (!maintenancePlanExists) {
+      content.services.packages.push(clone(defaultMaintenancePlan));
+    }
+
+    return content;
   }
 
   function save(content) {

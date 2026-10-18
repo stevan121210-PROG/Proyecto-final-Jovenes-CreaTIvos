@@ -339,6 +339,18 @@ textarea {
 .catalog-card .catalog-cta {
   margin-top: auto;
   width: fit-content;
+  padding: 0.55rem 1.1rem;
+  background: rgba(196, 154, 79, 0.08);
+  border-color: rgba(226, 199, 133, 0.55);
+  color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(196, 154, 79, 0.18);
+}
+
+.catalog-card .catalog-cta:hover {
+  background: rgba(196, 154, 79, 0.18);
+  border-color: var(--color-accent-light);
+  color: var(--color-accent-light);
+  box-shadow: 0 0 18px rgba(226, 199, 133, 0.42);
 }
 
 .ai-asistencia {
