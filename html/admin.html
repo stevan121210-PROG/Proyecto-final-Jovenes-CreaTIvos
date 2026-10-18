@@ -25,6 +25,7 @@
 
   <main class="catalogo-page admin-page">
     <div class="container admin-shell">
+      <p id="backend-status" class="panel-message" role="status" aria-live="polite">Comprobando conexión segura...</p>
       <section class="auth-card" id="login-section">
         <div class="auth-header">
           <p class="section-label">Acceso restringido</p>
@@ -33,8 +34,8 @@
 
         <form id="admin-login-form" class="auth-form" novalidate>
           <div class="input-row">
-            <label for="usuario">Usuario</label>
-            <input type="text" id="usuario" name="usuario" placeholder="admin" required />
+            <label for="usuario">Correo electrónico</label>
+            <input type="email" id="usuario" name="email" autocomplete="username" required />
           </div>
 
           <div class="input-row">
@@ -131,7 +132,7 @@
             <div id="admin-change-preview" class="admin-change-preview hidden" aria-live="polite">
               <h4 id="admin-change-title">Cambio pendiente</h4>
               <p id="admin-change-description"></p>
-              <p class="local-mode-warning">Modo demostración local: al confirmar, el cambio se guarda solo en este navegador; no se publica ni se sube a Internet. Las cuentas y contraseñas de este panel tampoco son adecuadas para producción.</p>
+              <p class="local-mode-warning">Al confirmar, el cambio se guarda en el backend compartido y queda visible para los visitantes.</p>
               <div class="session-actions">
                 <button type="button" class="btn btn-primary" id="confirm-admin-change-btn">Confirmar y guardar</button>
                 <button type="button" class="btn btn-secondary" id="cancel-admin-change-btn">Cancelar</button>
@@ -147,13 +148,13 @@
             <div id="create-admin-panel" class="panel-content hidden-panel">
               <form id="create-admin-form" class="panel-form" novalidate>
                 <div class="input-row">
-                  <label for="new-admin-user">Usuario</label>
-                  <input type="text" id="new-admin-user" placeholder="nuevo-admin" required />
+                  <label for="new-admin-user">Correo electrónico</label>
+                  <input type="email" id="new-admin-user" autocomplete="email" required />
                 </div>
 
                 <div class="input-row">
                   <label for="new-admin-pass">Contraseña</label>
-                  <input type="password" id="new-admin-pass" placeholder="••••••••" required />
+                  <input type="password" id="new-admin-pass" autocomplete="new-password" minlength="12" required />
                 </div>
 
                 <button type="submit" class="btn btn-primary">Crear perfil</button>
@@ -170,23 +171,13 @@
             <div id="edit-admin-panel" class="panel-content hidden-panel">
               <form id="edit-admin-form" class="panel-form" novalidate>
                 <div class="input-row">
-                  <label for="current-admin-user">Usuario actual</label>
-                  <input type="text" id="current-admin-user" placeholder="admin" required />
-                </div>
-
-                <div class="input-row">
-                  <label for="current-admin-pass">Contraseña actual</label>
-                  <input type="password" id="current-admin-pass" placeholder="••••••••" required />
-                </div>
-
-                <div class="input-row">
-                  <label for="updated-admin-user">Nuevo usuario</label>
-                  <input type="text" id="updated-admin-user" placeholder="nuevo-usuario" required />
+                  <label for="updated-admin-user">Nuevo correo (opcional)</label>
+                  <input type="email" id="updated-admin-user" autocomplete="email" />
                 </div>
 
                 <div class="input-row">
                   <label for="updated-admin-pass">Nueva contraseña</label>
-                  <input type="password" id="updated-admin-pass" placeholder="••••••••" required />
+                  <input type="password" id="updated-admin-pass" autocomplete="new-password" minlength="12" />
                 </div>
 
                 <button type="submit" class="btn btn-primary">Guardar cambios</button>
@@ -196,12 +187,11 @@
           </section>
 
           <section class="panel-section">
-            <h3>Sesiones</h3>
+            <h3>Administradores autorizados</h3>
             <div id="session-list" class="session-list" aria-live="polite"></div>
 
             <div class="session-actions">
               <button type="button" class="btn btn-secondary" id="logout-current-btn">Cerrar sesión actual</button>
-              <button type="button" class="btn btn-secondary" id="clear-unauthorized-btn">Cerrar sesiones no autorizadas</button>
             </div>
 
             <p id="session-message" class="panel-message" aria-live="polite"></p>

@@ -894,6 +894,7 @@ textarea {
 
 .session-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -902,8 +903,11 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
   color: var(--color-text);
-  cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.session-item strong {
+  overflow-wrap: anywhere;
 }
 
 .session-item:hover {

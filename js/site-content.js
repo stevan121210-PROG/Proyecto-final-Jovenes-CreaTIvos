@@ -1,6 +1,4 @@
 (() => {
-  const STORAGE_KEY = "programstyle_site_content";
-
   const DEFAULT_CONTENT = {
     home: {
       title: "Desarrollo de páginas web empresariales",
@@ -123,19 +121,18 @@
     }
   };
 
+  let currentContent = null;
+  let loadError = null;
+
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
 
-  function get() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return clone(DEFAULT_CONTENT);
-
-    const content = JSON.parse(saved);
+  function migrate(value) {
+    const content = clone(value);
     if (!content.services.quoteButtonLabel || !content.services.quoteButtonLabel.trim()) {
       content.services.quoteButtonLabel = DEFAULT_CONTENT.services.quoteButtonLabel;
     }
-
     const priceUpdates = {
       "Landing Page": ["Desde $2.200.000 COP (aprox. USD 550)", "$1.500.000 COP"],
       "Sitio Corporativo": ["Desde $4.500.000 COP (aprox. USD 1.125)", "$4.300.000 COP"],
@@ -162,22 +159,53 @@
       );
     }
 
-    const defaultMaintenancePlan = DEFAULT_CONTENT.services.packages.find((plan) => plan.name === "Mantenimiento Web");
-    const maintenancePlanExists = content.services.packages.some((plan) => plan.name === defaultMaintenancePlan.name);
-    if (!maintenancePlanExists) {
-      content.services.packages.push(clone(defaultMaintenancePlan));
+    const maintenancePlan = DEFAULT_CONTENT.services.packages.find((plan) => plan.name === "Mantenimiento Web");
+    if (!content.services.packages.some((plan) => plan.name === maintenancePlan.name)) {
+      content.services.packages.push(clone(maintenancePlan));
     }
 
     return content;
   }
 
-  function save(content) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
+  function get() {
+    return clone(currentContent || DEFAULT_CONTENT);
+  }
+
+  async function load() {
+    try {
+      const response = await fetch("/api/content", { headers: { Accept: "application/json" } });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
+      }
+      if (result.content) currentContent = migrate(result.content);
+      loadError = null;
+    } catch (error) {
+      loadError = error;
+      console.error("No se pudo cargar el contenido compartido de ProgramStyle:", error);
+    }
+    return get();
+  }
+
+  async function save(content) {
+    const response = await fetch("/api/content", {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ content })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
+    }
+    currentContent = migrate(content);
+    loadError = null;
+    return get();
   }
 
   function defaults() {
     return clone(DEFAULT_CONTENT);
   }
 
-  window.ProgramStyleContent = { get, save, defaults };
+  window.ProgramStyleContent = { get, load, save, defaults, getLoadError: () => loadError };
 })();

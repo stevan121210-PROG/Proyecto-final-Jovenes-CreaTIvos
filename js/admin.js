@@ -1,16 +1,3 @@
-const STORAGE_KEYS = {
-  users: "programstyle_admin_users",
-  session: "programstyle_admin_session",
-  sessions: "programstyle_admin_sessions"
-};
-
-const DEFAULT_ADMIN = {
-  usuario: "admin",
-  password: "programstyle123"
-};
-
-let ADMIN_CREDENTIALS = { ...DEFAULT_ADMIN };
-
 const loginForm = document.getElementById("admin-login-form");
 const loginError = document.getElementById("login-error");
 const loginSection = document.getElementById("login-section");
@@ -22,7 +9,7 @@ const editAdminMessage = document.getElementById("edit-admin-message");
 const sessionList = document.getElementById("session-list");
 const sessionMessage = document.getElementById("session-message");
 const logoutCurrentBtn = document.getElementById("logout-current-btn");
-const clearUnauthorizedBtn = document.getElementById("clear-unauthorized-btn");
+const backendStatus = document.getElementById("backend-status");
 const panelToggles = document.querySelectorAll(".panel-toggle");
 const adminChatForm = document.getElementById("admin-chat-form");
 const adminChatInput = document.getElementById("admin-chat-input");
@@ -43,6 +30,7 @@ const cancelChangeBtn = document.getElementById("cancel-admin-change-btn");
 
 let siteContent = window.ProgramStyleContent.get();
 let pendingAdminChange = null;
+let currentAdmin = null;
 
 let lastAdminHelpTopic = null;
 
@@ -51,32 +39,28 @@ const ADMIN_HELP_TOPICS = [
     id: "admin-create",
     keywords: ["crear administrador", "crear un administrador", "agregar administrador", "agregar un administrador", "agrego un administrador", "añadir administrador", "nuevo administrador", "otro administrador", "sumar un administrador", "crear usuario", "nuevo usuario", "otro usuario", "añadir usuario", "crear una cuenta", "nuevo perfil"],
     responses: [
-      "Para sumar a otra persona, abre “Agregar nuevo administrador”, completa usuario y contraseña y pulsa “Crear perfil”. Después revisa la propuesta: el perfil solo se guarda cuando confirmas. En esta demo queda solo en el navegador.",
-      "¡Claro! Despliega “Agregar nuevo administrador” y completa el formulario, pero no pegues la contraseña en el chat. Al preparar el perfil podrás revisar la propuesta y confirmar; los nombres repetidos no se aceptan."
+      "Para sumar a otra persona, abre “Agregar nuevo administrador”, indica su correo y una contraseña de al menos 12 caracteres. No la compartas en el chat. La cuenta se crea tras confirmar la propuesta."
     ]
   },
   {
     id: "admin-credentials",
     keywords: ["credenciales", "cambiar contraseña", "actualizar contraseña", "cambiar usuario", "editar perfil", "cambiar mi clave", "cambiar clave", "clave", "mi contraseña", "mi usuario"],
     responses: [
-      "Puedes cambiar ambos datos desde “Editar credenciales”: confirma tu usuario y contraseña actuales y escribe los nuevos. El panel te mostrará una vista previa antes de guardar el cambio.",
-      "Para renovar tu acceso, abre “Editar credenciales”. Al preparar el cambio podrás revisar el nuevo usuario; las credenciales solo se actualizan cuando confirmas."
+      "Puedes cambiar el correo, la contraseña o ambos desde “Editar credenciales”. El panel te mostrará una vista previa antes de aplicar el cambio."
     ]
   },
   {
     id: "admin-login",
     keywords: ["iniciar sesion", "entrar al panel", "no puedo entrar", "problema para entrar", "acceso al panel", "login", "olvide mi contraseña", "olvide la contraseña"],
     responses: [
-      "El acceso se hace desde la página Admin con el usuario y la contraseña registrados. Si olvidaste la clave, el panel todavía no tiene recuperación de contraseña; si aún tienes una sesión abierta, puedes cambiarla en “Editar credenciales”.",
-      "Ve a “Admin” e ingresa tus credenciales. Por ahora no existe un flujo para restablecer una contraseña olvidada, así que no quiero inventarte uno; si sigues dentro del panel, puedes actualizarla en “Editar credenciales”."
+      "El acceso se hace desde la página Admin con el correo y la contraseña de una cuenta autorizada. Si olvidaste la clave, inicia sesión en Supabase y usa “Editar credenciales” desde el panel si aún tienes acceso."
     ]
   },
   {
     id: "admin-sessions",
     keywords: ["sesion", "cerrar sesion", "sesiones", "no autorizada", "sesion activa"],
     responses: [
-      "En “Sesiones” puedes seleccionar registros y cerrar las sesiones no autorizadas. Si no seleccionas ninguna, ese botón cierra todas las no autorizadas; “Cerrar sesión actual” termina la tuya en este navegador.",
-      "La sección “Sesiones” te deja revisar los accesos registrados. Selecciona los que quieras cerrar y pulsa el botón de sesiones no autorizadas; si no marcas ninguno, se cierran todas las no autorizadas."
+      "El panel muestra las cuentas administradoras autorizadas; puedes agregar cuentas, cambiar tus credenciales o eliminar otra cuenta. “Cerrar sesión actual” termina tu sesión."
     ]
   },
   {
@@ -84,8 +68,7 @@ const ADMIN_HELP_TOPICS = [
     priority: -2,
     keywords: ["panel admin", "panel de admin", "panel de administracion", "funciones administrativas", "que hace admin"],
     responses: [
-      "El panel Admin reúne la gestión de perfiles y sesiones. También muestra accesos a Solicitudes, Servicios y Clientes, aunque esas tarjetas todavía son informativas y no gestionan datos.",
-      "Desde Admin puedes crear otros perfiles, actualizar tus credenciales y revisar sesiones. Las tarjetas de Solicitudes, Servicios y Clientes indican áreas previstas, pero aún no tienen herramientas de gestión."
+      "El panel Admin permite editar el contenido compartido de Inicio y Servicios, gestionar cuentas administrativas y cerrar tu sesión. Las tarjetas de Solicitudes y Clientes siguen siendo informativas."
     ]
   },
   {
@@ -93,8 +76,7 @@ const ADMIN_HELP_TOPICS = [
     priority: 10,
     keywords: ["editar el sitio", "editar inicio", "editar servicios", "editar precios", "editar la pagina", "cambiar contenido", "modificar contenido", "guardar cambios", "confirmar cambios", "publicar cambios", "guardar en este navegador"],
     responses: [
-      "Puedes pedirme un cambio con tus palabras o prepararlo en “Preparar un cambio del sitio”. Primero te mostraré una vista previa; solo al pulsar “Confirmar y guardar” se aplicará. En esta versión queda guardado en este navegador, no publicado en Internet.",
-      "Sí, puedo ayudarte a modificar el contenido de Inicio o Servicios. Descríbeme qué dato quieres cambiar y por cuál; revisarás la propuesta antes de confirmarla. Este modo local guarda en el navegador, pero no sube el sitio."
+      "Puedes pedirme un cambio con tus palabras o prepararlo en “Preparar un cambio del sitio”. Primero te mostraré una vista previa; solo al pulsar “Confirmar y guardar” se aplicará y quedará compartido para los visitantes."
     ]
   },
   {
@@ -207,8 +189,7 @@ const ADMIN_HELP_TOPICS = [
     id: "admin-limits",
     keywords: ["editar servicios", "editar precios", "cambiar catalogo", "gestionar clientes", "administrar solicitudes", "bandeja de entrada", "modificar pagina", "editar inicio"],
     responses: [
-      "Ahora puedes preparar cambios para el contenido de Inicio y Servicios, incluidos planes y precios, desde “Preparar un cambio del sitio”. Se muestra una vista previa y tienes que confirmar; esta versión solo guarda en el navegador. Las tarjetas de Solicitudes y Clientes siguen siendo informativas.",
-      "Para editar el catálogo o la portada, prepara el cambio desde este panel y confirma la vista previa. Se guarda localmente, no se publica; la gestión de solicitudes y clientes aún no está implementada."
+      "Ahora puedes preparar cambios para el contenido de Inicio y Servicios, incluidos planes y precios, desde “Preparar un cambio del sitio”. Se muestra una vista previa y tienes que confirmar; los cambios se guardan en el backend compartido. Las tarjetas de Solicitudes y Clientes siguen siendo informativas."
     ]
   },
   {
@@ -230,10 +211,10 @@ const ADMIN_HELP_TOPICS = [
 ];
 
 const ADMIN_HELP_FOLLOW_UPS = {
-  "admin-create": "Cuando tengas usuario y contraseña listos, abre el desplegable “Agregar nuevo administrador”. El panel te mostrará los datos de la cuenta (sin revelar la contraseña) y pedirá confirmación antes de guardarla localmente.",
-  "admin-credentials": "Ten a mano tus credenciales actuales: el formulario las verifica antes de preparar los nuevos datos. Revísalos y confirma para aplicar el cambio en este navegador.",
+  "admin-create": "Abre “Agregar nuevo administrador”, ingresa un correo y una contraseña de al menos 12 caracteres. La cuenta se crea en Supabase solo después de que confirmes la propuesta.",
+  "admin-credentials": "Abre “Editar credenciales”, ingresa un correo nuevo, una contraseña nueva o ambos, y confirma la propuesta para aplicar el cambio.",
   "admin-login": "La página de acceso está enlazada como “Admin” en la navegación. Si ya estás dentro, evita cerrar la sesión antes de actualizar las credenciales.",
-  "admin-sessions": "Haz clic en una sesión para seleccionarla; también puedes enfocarla y usar Enter o espacio. El botón de sesiones no autorizadas cambia su alcance si hay elementos seleccionados.",
+  "admin-sessions": "La lista de cuentas administradoras aparece en la sección “Administradores autorizados”. Puedes eliminar otras cuentas, pero no la cuenta con la que estás dentro.",
   "admin-overview": "Las secciones que hoy permiten acciones son la administración de perfiles y las sesiones. El resto del panel sirve como referencia de funciones que se podrían implementar más adelante.",
   "admin-requests": "El formulario está en la página “Servicios”, debajo del catálogo. La recepción de solicitudes dentro de Admin sería una función nueva, aún no implementada.",
   "home-projects": "Puedes volver a la parte superior con “Inicio” en el menú. Los enlaces de proyecto se abren en otra pestaña.",
@@ -247,10 +228,10 @@ const ADMIN_HELP_FOLLOW_UPS = {
   "service-ecommerce": "Si tienes necesidades específicas de pagos o inventario, descríbelas en el campo de mensaje del formulario para que se consideren al cotizar.",
   "service-ai": "Las tres opciones rápidas preparan mensajes distintos para WhatsApp. La interacción no ocurre en una conversación de IA embebida.",
   "contact": "El formulario solicita nombre, correo y mensaje; el teléfono y el servicio son opcionales. El contacto se abre mediante WhatsApp y correo.",
-  "admin-limits": "Puedes editar contenido de Inicio y Servicios en modo local, además de crear perfiles, cambiar credenciales y gestionar sesiones. Las solicitudes y clientes aún no tienen una bandeja de administración.",
+  "admin-limits": "Puedes editar el contenido compartido de Inicio y Servicios, crear cuentas y cambiar credenciales. Las solicitudes y clientes aún no tienen una bandeja de administración.",
   "admin-clients": "La administración de clientes y conversaciones aún no está implementada; puedo ayudarte a localizar las opciones de contacto que sí existen en Servicios.",
   "assistant": "Puedo resolver dudas usando la información del propio proyecto, pero no consulto Internet ni un modelo de IA. Si necesitas algo fuera de Admin, Inicio o Servicios, dime y trataré de orientarte con lo disponible.",
-  "local-editor": "Puedes editar títulos, descripciones, datos de proyectos, planes, precios, características, contacto y consultas rápidas. Las propuestas requieren confirmación y solo se guardan en este navegador."
+  "local-editor": "Puedes editar títulos, descripciones, datos de proyectos, planes, precios, características, contacto y consultas rápidas. Las propuestas requieren confirmación y se guardan en el backend compartido."
 };
 
 const CONTENT_FIELD_LABELS = {
@@ -454,51 +435,41 @@ function stageSiteContentChange(path, rawValue, source) {
   });
 }
 
-function confirmPendingAdminChange() {
+async function confirmPendingAdminChange() {
   if (!pendingAdminChange) return;
 
   try {
     if (pendingAdminChange.type === "site-content") {
-      window.ProgramStyleContent.save(pendingAdminChange.content);
-      siteContent = pendingAdminChange.content;
+      siteContent = await window.ProgramStyleContent.save(pendingAdminChange.content);
       renderContentFieldOptions();
       siteContentForm?.reset();
       updateContentFieldValue();
-      addChatMessage("¡Listo! El cambio quedó guardado en este navegador. Recarga Inicio o Servicios para verlo. Todavía no está publicado ni subido al sitio.", "assistant");
+      addChatMessage("¡Listo! El cambio quedó guardado en el sitio y ya está disponible para todos. Recarga Inicio o Servicios para verlo.", "assistant");
     } else if (pendingAdminChange.type === "admin-create") {
-      const users = getStoredUsers();
-      if (users.some((user) => user.usuario === pendingAdminChange.user.usuario)) {
-        addChatMessage("No guardé la cuenta: ese usuario ya existe. Cancela esta propuesta y prepara otra con un nombre distinto.", "assistant");
-        return;
-      }
-      users.push(pendingAdminChange.user);
-      saveUsers(users);
+      await adminRequest("/api/admins", {
+        method: "POST",
+        body: JSON.stringify(pendingAdminChange.user)
+      });
       createAdminForm?.reset();
-      setMessage(createAdminMessage, "Nuevo administrador guardado en este navegador.", "success");
-      addChatMessage(`La cuenta “${pendingAdminChange.user.usuario}” quedó guardada localmente después de tu confirmación. No se ha publicado ni sincronizado con otros dispositivos.`, "assistant");
+      await updateSessionList();
+      setMessage(createAdminMessage, "Nueva cuenta administradora guardada.", "success");
+      addChatMessage(`La cuenta “${pendingAdminChange.user.email}” se creó tras tu confirmación.`, "assistant");
     } else if (pendingAdminChange.type === "admin-profile") {
-      const users = getStoredUsers();
-      const currentIndex = users.findIndex((user) => user.usuario === pendingAdminChange.currentUser);
-      if (currentIndex < 0) {
-        addChatMessage("No guardé el cambio porque el perfil actual ya no está disponible.", "assistant");
-        return;
-      }
-      users[currentIndex] = pendingAdminChange.profile;
-      saveUsers(users);
-
-      const sessions = getStoredSessions().map((entry) =>
-        entry.user === pendingAdminChange.currentUser ? { ...entry, user: pendingAdminChange.profile.usuario } : entry
-      );
-      saveSessions(sessions);
-      ADMIN_CREDENTIALS = { ...pendingAdminChange.profile };
-      setCurrentSession(pendingAdminChange.profile.usuario);
+      const profile = await adminRequest("/api/admins", {
+        method: "PATCH",
+        body: JSON.stringify(pendingAdminChange.profile)
+      });
+      currentAdmin = profile.admin;
       editAdminForm?.reset();
-      updateSessionList();
-      setMessage(editAdminMessage, "Credenciales guardadas en este navegador.", "success");
-      addChatMessage("Credenciales actualizadas tras tu confirmación. El cambio es local a este navegador.", "assistant");
+      await updateSessionList();
+      setMessage(editAdminMessage, "Credenciales actualizadas.", "success");
+      addChatMessage("Credenciales actualizadas en la cuenta administrativa.", "assistant");
     }
   } catch (error) {
-    addChatMessage(`No se pudo guardar el cambio en este navegador: ${error.message}`, "assistant");
+    addChatMessage(`No se pudo guardar el cambio: ${error.message}`, "assistant");
+    if (pendingAdminChange.type === "admin-create") setMessage(createAdminMessage, error.message, "error");
+    else if (pendingAdminChange.type === "admin-profile") setMessage(editAdminMessage, error.message, "error");
+    else setBackendStatus(error.message, "error");
     return;
   }
 
@@ -508,6 +479,8 @@ function confirmPendingAdminChange() {
 
 function cancelPendingAdminChange() {
   if (!pendingAdminChange) return;
+  if (pendingAdminChange.type === "admin-create") createAdminForm?.reset();
+  if (pendingAdminChange.type === "admin-profile") editAdminForm?.reset();
   pendingAdminChange = null;
   changePreview.classList.add("hidden");
   createAdminForm?.reset();
@@ -605,7 +578,7 @@ function getSafeCreateAdminGuidance() {
   const createPanel = document.getElementById("create-admin-panel");
   createPanel?.classList.remove("hidden-panel");
   createPanel?.scrollIntoView({ behavior: "smooth", block: "center" });
-  return "Puedo acompañarte, pero no escribas contraseñas en el chat. Abre “Agregar nuevo administrador”, completa el formulario del panel y pulsa “Crear perfil”; te mostraré una vista previa y la cuenta solo se guardará cuando confirmes.";
+  return "Puedo acompañarte, pero no escribas contraseñas en el chat. Abre “Agregar nuevo administrador”, ingresa un correo y una contraseña segura de al menos 12 caracteres; la cuenta solo se crea cuando confirmes.";
 }
 
 function getDynamicAdminHelpResponse(topic) {
@@ -613,7 +586,7 @@ function getDynamicAdminHelpResponse(topic) {
 
   if (topic.id === "service-prices") {
     const prices = packages.map(({ name, price }) => `${name}: ${price}`).join("; ");
-    return `Los precios que aparecen ahora en Servicios son: ${prices}. Son los valores guardados en este navegador y pueden variar según el proyecto.`;
+    return `Los precios que aparecen ahora en Servicios son: ${prices}. Son los valores compartidos del sitio y pueden variar según el proyecto.`;
   }
 
   if (topic.id === "service-overview") {
@@ -664,113 +637,121 @@ function getDynamicAdminHelpResponse(topic) {
   return null;
 }
 
-function getStoredUsers() {
-  const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || "null");
-  if (!stored || !stored.length) {
-    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify([DEFAULT_ADMIN]));
-    return [DEFAULT_ADMIN];
+async function adminRequest(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    credentials: "same-origin",
+    headers: {
+      Accept: "application/json",
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...options.headers
+    }
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
   }
-
-  return stored;
+  return result;
 }
 
-function saveUsers(users) {
-  localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
-}
-
-function getCurrentSession() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.session) || "null");
-}
-
-function setCurrentSession(user) {
-  localStorage.setItem(STORAGE_KEYS.session, JSON.stringify({ user, loggedIn: true }));
-}
-
-function clearCurrentSession() {
-  localStorage.removeItem(STORAGE_KEYS.session);
-}
-
-function getStoredSessions() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.sessions) || "[]");
-}
-
-function saveSessions(sessions) {
-  localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(sessions));
-}
-
-function updateSessionList() {
+async function updateSessionList() {
   if (!sessionList) return;
+  try {
+    const { admins } = await adminRequest("/api/admins");
+    if (!admins.length) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.className = "panel-message";
+      emptyMessage.textContent = "No hay cuentas administradoras.";
+      sessionList.replaceChildren(emptyMessage);
+      return;
+    }
 
-  const sessions = getStoredSessions();
-  if (!sessions.length) {
-    const emptyMessage = document.createElement("p");
-    emptyMessage.className = "panel-message";
-    emptyMessage.textContent = "No hay sesiones registradas.";
-    sessionList.replaceChildren(emptyMessage);
-    return;
-  }
+    const adminItems = admins.map((admin) => {
+      const item = document.createElement("div");
+      item.className = "session-item";
 
-  const sessionItems = sessions.map((entry) => {
-    const statusClass = entry.status === "active" ? "active" : "unauthorized";
-    const label = entry.status === "active" ? "Activa" : "No autorizada";
-    const item = document.createElement("div");
-    item.className = "session-item";
-    item.dataset.user = entry.user;
-    item.dataset.status = entry.status;
-    item.tabIndex = 0;
+      const user = document.createElement("strong");
+      user.textContent = admin.email;
 
-    const user = document.createElement("strong");
-    user.textContent = entry.user;
+      const badge = document.createElement("span");
+      badge.className = "badge active";
+      badge.textContent = admin.id === currentAdmin?.id ? "Tu cuenta" : "Administrador";
+      item.append(user, badge);
 
-    const badge = document.createElement("span");
-    badge.className = `badge ${statusClass}`;
-    badge.textContent = label;
-
-    item.append(user, badge);
-    return item;
-  });
-  sessionList.replaceChildren(...sessionItems);
-
-  sessionList.querySelectorAll(".session-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      item.classList.toggle("selected");
-    });
-
-    item.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        item.classList.toggle("selected");
+      if (admin.id !== currentAdmin?.id) {
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "btn btn-secondary";
+        removeButton.textContent = "Eliminar";
+        removeButton.addEventListener("click", async () => {
+          if (!window.confirm(`¿Eliminar la cuenta administradora ${admin.email}?`)) return;
+          try {
+            await adminRequest(`/api/admins?id=${encodeURIComponent(admin.id)}`, { method: "DELETE" });
+            setMessage(sessionMessage, `Se eliminó ${admin.email}.`, "success");
+            await updateSessionList();
+          } catch (error) {
+            setMessage(sessionMessage, error.message, "error");
+          }
+        });
+        item.append(removeButton);
       }
+      return item;
     });
-  });
+    sessionList.replaceChildren(...adminItems);
+  } catch (error) {
+    setMessage(sessionMessage, error.message, "error");
+  }
 }
 
-function ensureAdminSessionState() {
-  const users = getStoredUsers();
-  const currentUser = getCurrentSession();
-
-  if (users.length) {
-    const activeUser = users.find((user) => user.usuario === currentUser?.user);
-    if (activeUser) {
-      ADMIN_CREDENTIALS = { ...activeUser };
-    }
+function showAdminDashboard(admin) {
+  currentAdmin = admin;
+  if (loginSection) loginSection.classList.add("hidden");
+  if (adminDashboard) {
+    adminDashboard.classList.remove("hidden");
+    adminDashboard.classList.add("visible");
   }
-
-  if (currentUser?.loggedIn) {
-    const sessions = getStoredSessions();
-    const sessionExists = sessions.some((entry) => entry.user === currentUser.user && entry.status === "active");
-    if (!sessionExists) {
-      sessions.push({ user: currentUser.user, status: "active" });
-      saveSessions(sessions);
-    }
-  }
-
   updateSessionList();
 }
 
-function validateLogin(usuario, password) {
-  const users = getStoredUsers();
-  return users.some((user) => user.usuario === usuario && user.password === password);
+function showLogin() {
+  currentAdmin = null;
+  if (loginSection) loginSection.classList.remove("hidden");
+  if (adminDashboard) {
+    adminDashboard.classList.add("hidden");
+    adminDashboard.classList.remove("visible");
+  }
+}
+
+function setBackendStatus(message, type = "") {
+  if (!backendStatus) return;
+  backendStatus.textContent = message;
+  backendStatus.classList.remove("success", "error");
+  if (type) backendStatus.classList.add(type);
+}
+
+async function initializeAdmin() {
+  siteContent = await window.ProgramStyleContent.load();
+  renderContentFieldOptions();
+  updateContentFieldValue();
+  const contentError = window.ProgramStyleContent.getLoadError();
+  if (contentError) {
+    showLogin();
+    setBackendStatus(`No se pudo cargar el contenido compartido: ${contentError.message}`, "error");
+    return;
+  }
+
+  try {
+    const result = await adminRequest("/api/auth/session");
+    showAdminDashboard(result.admin);
+    setBackendStatus("Conectado: los cambios se guardan de forma compartida.", "success");
+  } catch (error) {
+    showLogin();
+    if (!error.message.includes("No hay una sesión activa") && !error.message.includes("La sesión expiró")) {
+      setBackendStatus(error.message, "error");
+    } else {
+      setBackendStatus("Backend conectado. Inicia sesión con una cuenta autorizada.");
+    }
+  }
 }
 
 function setMessage(element, text, type) {
@@ -793,7 +774,7 @@ function normaliseChatText(text) {
 function getAdminHelpResponse(question) {
   const normalisedQuestion = normaliseChatText(question);
   if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal)$/.test(normalisedQuestion)) {
-    return "¡Hola! Aquí estoy para ayudarte. Puedes preguntarme por Admin, Inicio o Servicios; también puedes pedirme un cambio, revisar la propuesta y decidir si quieres guardarla localmente.";
+    return "¡Hola! Aquí estoy para ayudarte. Puedes preguntarme por Admin, Inicio o Servicios; también puedes pedirme un cambio, revisar la propuesta y decidir si quieres guardarla para todos.";
   }
 
   if (/^(gracias|muchas gracias|te agradezco|perfecto gracias|listo gracias)$/.test(normalisedQuestion)) {
@@ -801,7 +782,7 @@ function getAdminHelpResponse(question) {
   }
 
   if (/^(que puedes hacer|en que me ayudas|como me ayudas|ayuda|ayudame)$/.test(normalisedQuestion)) {
-    return "Puedo guiarte por Admin, Inicio y Servicios; editar títulos, descripciones, proyectos, precios, características y datos de contacto; y ayudarte a preparar cuentas admin. Antes de guardar cualquier propuesta te pediré confirmación. En este modo los cambios solo quedan en este navegador, no se publican.";
+    return "Puedo guiarte por Admin, Inicio y Servicios; editar títulos, descripciones, proyectos, precios, características y datos de contacto; y ayudarte a preparar cuentas admin. Antes de guardar cualquier propuesta te pediré confirmación. Los cambios confirmados se comparten con los visitantes.";
   }
 
   if (/\b(crear|agregar|añadir|sumar)\b/.test(normalisedQuestion) && /\b(admin|administrador|usuario|cuenta)\b/.test(normalisedQuestion)) {
@@ -815,7 +796,7 @@ function getAdminHelpResponse(question) {
     if (pendingAdminChange) return "Primero confirma o cancela la propuesta que ya está pendiente; así no se mezclan cambios.";
 
     return stageSiteContentChange(requestedChange.path, requestedChange.value, "chat")
-      ? "Preparé una vista previa del cambio. Revísala y pulsa “Confirmar y guardar” si estás de acuerdo; puedes cancelarla sin guardar. Se quedará en este navegador, no se publicará."
+      ? "Preparé una vista previa del cambio. Revísala y pulsa “Confirmar y guardar” si estás de acuerdo; puedes cancelarla sin guardar. Al confirmarlo, se guardará para los visitantes."
       : "No pude preparar ese cambio: revisa que el contenido no esté vacío y que los enlaces, el correo o el número tengan un formato válido.";
   }
 
@@ -899,48 +880,33 @@ function sendAdminChatMessage(question) {
   addChatMessage(getAdminHelpResponse(trimmedQuestion), "assistant");
 }
 
-function loginToDashboard(user) {
-  setCurrentSession(user);
-  const sessions = getStoredSessions();
-  const normalised = sessions.filter((entry) => entry.user !== user || entry.status === "active");
-  normalised.push({ user, status: "active" });
-  saveSessions(normalised);
-
-  if (loginSection) loginSection.classList.add("hidden");
-  if (adminDashboard) {
-    adminDashboard.classList.remove("hidden");
-    adminDashboard.classList.add("visible");
-  }
-
-  updateSessionList();
-}
-
 if (loginForm) {
   loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const usuario = document.getElementById("usuario").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const email = document.getElementById("usuario").value.trim();
+    const password = document.getElementById("password").value;
 
-    if (!usuario || !password) {
-      setMessage(loginError, "Completa usuario y contraseña para continuar.", "error");
+    if (!email || !password) {
+      setMessage(loginError, "Completa el correo y la contraseña para continuar.", "error");
+      return;
+    }
+    if (window.ProgramStyleContent.getLoadError()) {
+      setMessage(loginError, "No se pudo cargar el contenido del sitio. Actualiza la página y comprueba la conexión antes de iniciar sesión.", "error");
       return;
     }
 
-    if (validateLogin(usuario, password)) {
+    adminRequest("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password })
+    }).then(({ admin }) => {
+      showAdminDashboard(admin);
+      setBackendStatus("Conectado: los cambios se guardan de forma compartida.", "success");
       setMessage(loginError, "Acceso correcto.", "success");
-      loginToDashboard(usuario);
       loginForm.reset();
-      return;
-    }
-
-    const sessions = getStoredSessions();
-    sessions.push({ user: usuario, status: "unauthorized" });
-    saveSessions(sessions);
-    updateSessionList();
-
-    setMessage(loginError, "Usuario o contraseña incorrectos.", "error");
-    loginForm.reset();
+    }).catch((error) => {
+      setMessage(loginError, error.message, "error");
+    });
   });
 }
 
@@ -948,19 +914,15 @@ if (createAdminForm) {
   createAdminForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const nombre = document.getElementById("new-admin-user").value.trim();
-    const password = document.getElementById("new-admin-pass").value.trim();
+    const email = document.getElementById("new-admin-user").value.trim();
+    const password = document.getElementById("new-admin-pass").value;
 
-    if (!nombre || !password) {
-      setMessage(createAdminMessage, "Completa usuario y contraseña del nuevo perfil.", "error");
+    if (!email || !password) {
+      setMessage(createAdminMessage, "Completa el correo y la contraseña del nuevo perfil.", "error");
       return;
     }
-
-    const users = getStoredUsers();
-    const exists = users.some((user) => user.usuario === nombre);
-
-    if (exists) {
-      setMessage(createAdminMessage, "Ese usuario ya existe. Elige otro nombre.", "error");
+    if (password.length < 12) {
+      setMessage(createAdminMessage, "La contraseña debe tener al menos 12 caracteres.", "error");
       return;
     }
 
@@ -971,13 +933,13 @@ if (createAdminForm) {
 
     const staged = stageAdminChange({
       type: "admin-create",
-      user: { usuario: nombre, password },
+      user: { email, password },
       title: "Confirma la nueva cuenta administrativa",
-      description: `Se creará el usuario “${nombre}”. La contraseña no se muestra en la vista previa.`
+      description: `Se creará la cuenta administradora “${email}”. La contraseña no se muestra en la vista previa.`
     });
     if (staged) {
       setMessage(createAdminMessage, "Propuesta lista. La cuenta solo se guardará al confirmar.", "success");
-      addChatMessage(`Tengo lista la propuesta para crear “${nombre}”. Revisa la vista previa y confirma si quieres guardarla localmente.`, "assistant");
+      addChatMessage(`Tengo lista la propuesta para crear “${email}”. Revisa la vista previa y confirma si quieres guardarla.`, "assistant");
     }
   });
 }
@@ -986,36 +948,15 @@ if (editAdminForm) {
   editAdminForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const usuarioActual = document.getElementById("current-admin-user").value.trim();
-    const passwordActual = document.getElementById("current-admin-pass").value.trim();
-    const nuevoUsuario = document.getElementById("updated-admin-user").value.trim();
-    const nuevaPassword = document.getElementById("updated-admin-pass").value.trim();
+    const nuevoCorreo = document.getElementById("updated-admin-user").value.trim();
+    const nuevaPassword = document.getElementById("updated-admin-pass").value;
 
-    if (!usuarioActual || !passwordActual || !nuevoUsuario || !nuevaPassword) {
-      setMessage(editAdminMessage, "Debes completar todos los campos para actualizar el perfil.", "error");
+    if (!nuevoCorreo && !nuevaPassword) {
+      setMessage(editAdminMessage, "Indica un correo nuevo, una contraseña nueva o ambos.", "error");
       return;
     }
-
-    const users = getStoredUsers();
-    const currentUser = getCurrentSession()?.user || ADMIN_CREDENTIALS.usuario;
-    const currentProfile = users.find((user) => user.usuario === currentUser);
-
-    if (!currentProfile) {
-      setMessage(editAdminMessage, "No existe un perfil activo para actualizar.", "error");
-      return;
-    }
-
-    if (usuarioActual !== currentUser || passwordActual !== currentProfile.password) {
-      setMessage(editAdminMessage, "Los datos del perfil actual no coinciden.", "error");
-      return;
-    }
-
-    const duplicateUser = users.some(
-      (user, index) => index !== users.indexOf(currentProfile) && user.usuario === nuevoUsuario
-    );
-
-    if (duplicateUser) {
-      setMessage(editAdminMessage, "El nuevo usuario ya está en uso.", "error");
+    if (nuevaPassword && nuevaPassword.length < 12) {
+      setMessage(editAdminMessage, "La contraseña debe tener al menos 12 caracteres.", "error");
       return;
     }
 
@@ -1026,14 +967,16 @@ if (editAdminForm) {
 
     const staged = stageAdminChange({
       type: "admin-profile",
-      currentUser,
-      profile: { usuario: nuevoUsuario, password: nuevaPassword },
+      profile: {
+        ...(nuevoCorreo ? { email: nuevoCorreo } : {}),
+        ...(nuevaPassword ? { password: nuevaPassword } : {})
+      },
       title: "Confirma la actualización de credenciales",
-      description: `El usuario “${currentUser}” cambiará a “${nuevoUsuario}”. La contraseña no se muestra en la vista previa.`
+      description: `Se actualizarán las credenciales de “${currentAdmin.email}”. La contraseña no se muestra en la vista previa.`
     });
     if (staged) {
       setMessage(editAdminMessage, "Propuesta lista. Las credenciales solo cambiarán al confirmar.", "success");
-      addChatMessage("Preparé la actualización de credenciales. Revisa los usuarios en la vista previa y confirma para guardarla en este navegador.", "assistant");
+      addChatMessage("Preparé la actualización de credenciales. Revisa la vista previa y confirma para guardarla de forma segura.", "assistant");
     }
   });
 }
@@ -1104,7 +1047,7 @@ if (siteContentForm && siteContentField && siteContentValue) {
     }
 
     if (stageSiteContentChange(siteContentField.value, siteContentValue.value, "editor")) {
-      addChatMessage("Ya está lista la vista previa. Revísala y confirma si quieres guardar este cambio localmente.", "assistant");
+      addChatMessage("Ya está lista la vista previa. Revísala y confirma si quieres guardar este cambio para todos.", "assistant");
     } else {
       addChatMessage("No pude preparar el cambio. Comprueba que no esté vacío y que el enlace, correo o teléfono tenga un formato válido.", "assistant");
     }
@@ -1145,36 +1088,14 @@ if (chatQuestionButtons.length) {
 }
 
 if (logoutCurrentBtn) {
-  logoutCurrentBtn.addEventListener("click", () => {
-    const current = getCurrentSession();
-    const sessions = getStoredSessions().filter((entry) => !(entry.user === current?.user && entry.status === "active"));
-    saveSessions(sessions);
-    clearCurrentSession();
-    updateSessionList();
-
-    if (loginSection) loginSection.classList.remove("hidden");
-    if (adminDashboard) {
-      adminDashboard.classList.add("hidden");
-      adminDashboard.classList.remove("visible");
+  logoutCurrentBtn.addEventListener("click", async () => {
+    try {
+      await adminRequest("/api/auth/logout", { method: "POST" });
+      showLogin();
+      setMessage(sessionMessage, "Sesión cerrada.", "success");
+    } catch (error) {
+      setMessage(sessionMessage, error.message, "error");
     }
-
-    setMessage(sessionMessage, "Sesión actual cerrada.", "success");
-  });
-}
-
-if (clearUnauthorizedBtn) {
-  clearUnauthorizedBtn.addEventListener("click", () => {
-    const selectedSessions = Array.from(document.querySelectorAll(".session-item.selected"));
-    const selectedUsers = selectedSessions.map((item) => item.dataset.user);
-
-    const sessions = getStoredSessions().filter((entry) => {
-      if (!selectedUsers.length) return entry.status !== "unauthorized";
-      return !(selectedUsers.includes(entry.user));
-    });
-
-    saveSessions(sessions);
-    updateSessionList();
-    setMessage(sessionMessage, selectedUsers.length ? "Sesiones seleccionadas cerradas." : "Sesiones no autorizadas cerradas.", "success");
   });
 }
 
@@ -1188,13 +1109,7 @@ if (panelToggles.length) {
   });
 }
 
-ensureAdminSessionState();
-renderContentFieldOptions();
-
-if (getCurrentSession()?.loggedIn) {
-  if (loginSection) loginSection.classList.add("hidden");
-  if (adminDashboard) {
-    adminDashboard.classList.remove("hidden");
-    adminDashboard.classList.add("visible");
-  }
-}
+initializeAdmin().catch((error) => {
+  console.error("No se pudo iniciar el panel administrativo:", error);
+  setBackendStatus(error.message, "error");
+});

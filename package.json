@@ -1,0 +1,15 @@
+{
+  "name": "programstyle-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Servidor local para las páginas de ProgramStyle",
+  "engines": {
+    "node": ">=20.18"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0"
+  }
+}
