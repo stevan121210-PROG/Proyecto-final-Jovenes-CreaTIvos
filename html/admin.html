@@ -76,6 +76,44 @@
         </div>
 
         <div class="admin-sections">
+          <section class="panel-section admin-assistant" aria-labelledby="admin-assistant-title">
+            <div class="assistant-layout">
+              <div class="assistant-chat">
+                <h3 id="admin-assistant-title">Asistente administrativo</h3>
+                <p class="assistant-description">Pregúntame con tus palabras sobre Admin, Inicio o Servicios. Te guío con lo que ya está disponible y te aviso si algo aún está pendiente.</p>
+
+                <div id="admin-chat-messages" class="admin-chat-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación con el asistente">
+                  <div class="chat-message assistant-message">
+                    <strong>Asistente</strong>
+                    <p>¡Hola! ¿Qué andas buscando? Puedo ayudarte con el panel, contarte qué hay en Inicio o revisar contigo los planes de Servicios. Pregúntame como te salga.</p>
+                  </div>
+                </div>
+
+                <div class="assistant-suggestions" aria-label="Preguntas sugeridas">
+                  <button type="button" class="ai-option" data-chat-question="¿Cómo agrego un administrador?">Agregar administrador</button>
+                  <button type="button" class="ai-option" data-chat-question="¿Cómo gestiono las sesiones?">Gestionar sesiones</button>
+                  <button type="button" class="ai-option" data-chat-question="¿Qué puedo ver en Inicio?">Explorar Inicio</button>
+                  <button type="button" class="ai-option" data-chat-question="¿Qué servicios y planes ofrecen?">Ver servicios</button>
+                  <button type="button" class="ai-option" data-chat-question="¿Cuánto cuestan los planes?">Consultar precios</button>
+                </div>
+
+                <form id="admin-chat-form" class="admin-chat-form">
+                  <label for="admin-chat-input">¿Qué te gustaría saber?</label>
+                  <div class="admin-chat-input-row">
+                    <input type="text" id="admin-chat-input" name="question" maxlength="300" autocomplete="off" placeholder="Pregunta sobre Admin, Inicio o Servicios..." required />
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                  </div>
+                </form>
+              </div>
+
+              <aside class="admin-future-slot" id="admin-future-feature-slot" aria-labelledby="admin-future-slot-title">
+                <p class="section-label">Espacio reservado</p>
+                <h4 id="admin-future-slot-title">Próxima función</h4>
+                <p>Aquí podremos incorporar la nueva herramienta administrativa que definamos después.</p>
+              </aside>
+            </div>
+          </section>
+
           <section class="panel-section">
             <button type="button" class="panel-toggle" data-target="create-admin-panel">
               Agregar nuevo administrador
