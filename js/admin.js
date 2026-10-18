@@ -217,28 +217,43 @@ if (editAdminForm) {
     }
 
     const users = getStoredUsers();
-    const userIndex = users.findIndex(
-      (user) => user.usuario === usuarioActual && user.password === passwordActual
-    );
+    const currentUser = getCurrentSession()?.user || ADMIN_CREDENTIALS.usuario;
+    const currentProfile = users.find((user) => user.usuario === currentUser);
 
-    if (userIndex === -1) {
+    if (!currentProfile) {
+      setMessage(editAdminMessage, "No existe un perfil activo para actualizar.", "error");
+      return;
+    }
+
+    if (usuarioActual !== currentUser || passwordActual !== currentProfile.password) {
       setMessage(editAdminMessage, "Los datos del perfil actual no coinciden.", "error");
       return;
     }
 
-    const duplicateUser = users.some((user, index) => index !== userIndex && user.usuario === nuevoUsuario);
+    const duplicateUser = users.some(
+      (user, index) => index !== users.indexOf(currentProfile) && user.usuario === nuevoUsuario
+    );
+
     if (duplicateUser) {
       setMessage(editAdminMessage, "El nuevo usuario ya está en uso.", "error");
       return;
     }
 
-    users[userIndex] = { usuario: nuevoUsuario, password: nuevaPassword };
+    const profileIndex = users.indexOf(currentProfile);
+    users[profileIndex] = { usuario: nuevoUsuario, password: nuevaPassword };
     saveUsers(users);
+
+    const sessions = getStoredSessions().map((entry) =>
+      entry.user === currentUser ? { ...entry, user: nuevoUsuario } : entry
+    );
+    saveSessions(sessions);
+
     ADMIN_CREDENTIALS = { usuario: nuevoUsuario, password: nuevaPassword };
     setCurrentSession(nuevoUsuario);
 
     setMessage(editAdminMessage, "Perfil actualizado correctamente.", "success");
     editAdminForm.reset();
+    updateSessionList();
   });
 }
 
