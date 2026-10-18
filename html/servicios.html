@@ -26,8 +26,8 @@
   <main class="catalogo-page">
     <section class="page-header">
       <div class="container">
-        <h1>Nuestros Planes y Servicios Web</h1>
-        <p>
+        <h1 id="services-title">Nuestros Planes y Servicios Web</h1>
+        <p id="services-description">
           Presentamos los paquetes de desarrollo empresarial de ProgramStyle.
           Los precios son sugeridos y pueden variar según urgencia, integraciones de IA y detalle del proyecto.
         </p>
@@ -37,8 +37,8 @@
     <section class="container catalogo" id="catalogo-container"></section>
 
     <section class="container ai-asistencia">
-      <h2>Asistencia con IA</h2>
-      <p>
+      <h2 id="services-ai-title">Asistencia con IA</h2>
+      <p id="services-ai-description">
         Recibe orientación rápida sobre el tipo de proyecto, presupuesto estimado y la mejor opción para tu negocio.
         Este servicio puede requerir detalles adicionales según el alcance del proyecto.
       </p>
@@ -46,23 +46,19 @@
 
       <div class="ai-panel" id="ia-panel" aria-live="polite">
         <p class="ai-panel-title">Selecciona una consulta rápida:</p>
-        <div class="ai-options">
-          <button type="button" class="ai-option" data-prompt="Necesito una Landing Page para presentar mi negocio y captar clientes por WhatsApp.">Landing Page</button>
-          <button type="button" class="ai-option" data-prompt="Quiero un sitio corporativo para mi empresa con secciones de servicios, proyectos y contacto.">Sitio corporativo</button>
-          <button type="button" class="ai-option" data-prompt="Necesito un ecommerce para vender productos online con catálogo y pagos seguros.">E-commerce</button>
-        </div>
+        <div class="ai-options" id="services-ai-options"></div>
       </div>
     </section>
 
     <section class="container contacto-page">
       <div class="contact-grid">
         <div class="contact-info">
-          <h2>Contacto directo</h2>
-          <p>Teléfono / WhatsApp</p>
-          <a href="https://wa.me/573027473875" target="_blank" rel="noreferrer">+57 302 747 3875</a>
-          <p>Correo electrónico</p>
-          <a href="mailto:Stevan121210@gmail.com">Stevan121210@gmail.com</a>
-          <p class="contact-note">
+          <h2 id="contact-title">Contacto directo</h2>
+          <p id="contact-phone-label">Teléfono / WhatsApp</p>
+          <a id="contact-phone" href="https://wa.me/573027473875" target="_blank" rel="noreferrer">+57 302 747 3875</a>
+          <p id="contact-email-label">Correo electrónico</p>
+          <a id="contact-email" href="mailto:Stevan121210@gmail.com">Stevan121210@gmail.com</a>
+          <p class="contact-note" id="contact-note">
             Completa el formulario para solicitar una cotización o describir tu requerimiento.
             Incluye el tipo de servicio si ya sabes qué plan te interesa.
           </p>
@@ -70,44 +66,40 @@
 
         <form id="contact-form" class="contact-form" novalidate>
           <div class="form-row">
-            <label for="nombre">Nombre completo</label>
+            <label for="nombre" id="name-label">Nombre completo</label>
             <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required aria-label="Nombre completo" />
           </div>
 
           <div class="form-row">
-            <label for="email">Correo electrónico</label>
+            <label for="email" id="email-field-label">Correo electrónico</label>
             <input type="email" id="email" name="email" placeholder="nombre@ejemplo.com" required aria-label="Correo electrónico" />
           </div>
 
           <div class="form-row">
-            <label for="telefono">Teléfono / WhatsApp (opcional)</label>
+            <label for="telefono" id="phone-field-label">Teléfono / WhatsApp (opcional)</label>
             <input type="tel" id="telefono" name="telefono" placeholder="+57 321 1234567" aria-label="Teléfono o WhatsApp" />
           </div>
 
           <div class="form-row">
-            <label for="servicio">Tipo de servicio</label>
+            <label for="servicio" id="package-field-label">Tipo de servicio</label>
             <select id="servicio" name="servicio" aria-label="Tipo de servicio">
               <option value="">Seleccione un plan</option>
-              <option value="Landing Page">Landing Page</option>
-              <option value="Sitio Corporativo">Sitio Corporativo</option>
-              <option value="Descuento especial Landing">Descuento especial Landing</option>
-              <option value="E-commerce">E-commerce</option>
-              <option value="Otro">Otro</option>
             </select>
           </div>
 
           <div class="form-row">
-            <label for="mensaje">Mensaje o detalle del requerimiento</label>
+            <label for="mensaje" id="message-label">Mensaje o detalle del requerimiento</label>
             <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos qué necesitas" required aria-label="Mensaje o detalle del requerimiento"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+          <button type="submit" class="btn btn-primary" id="contact-submit-label">Enviar solicitud</button>
           <p class="form-feedback" id="form-feedback" aria-live="polite"></p>
         </form>
       </div>
     </section>
   </main>
 
+  <script src="../js/site-content.js"></script>
   <script src="../js/servicios.js"></script>
 </body>
 </html>

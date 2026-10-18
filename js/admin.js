@@ -28,6 +28,21 @@ const adminChatForm = document.getElementById("admin-chat-form");
 const adminChatInput = document.getElementById("admin-chat-input");
 const adminChatMessages = document.getElementById("admin-chat-messages");
 const chatQuestionButtons = document.querySelectorAll("[data-chat-question]");
+const siteContentForm = document.getElementById("site-content-form");
+const siteContentField = document.getElementById("site-content-field");
+const siteContentValue = document.getElementById("site-content-value");
+const siteContentSelect = document.getElementById("site-content-custom-select");
+const siteContentSelectTrigger = document.getElementById("site-content-select-trigger");
+const siteContentSelectLabel = document.getElementById("site-content-selected-label");
+const siteContentOptions = document.getElementById("site-content-options");
+const changePreview = document.getElementById("admin-change-preview");
+const changeTitle = document.getElementById("admin-change-title");
+const changeDescription = document.getElementById("admin-change-description");
+const confirmChangeBtn = document.getElementById("confirm-admin-change-btn");
+const cancelChangeBtn = document.getElementById("cancel-admin-change-btn");
+
+let siteContent = window.ProgramStyleContent.get();
+let pendingAdminChange = null;
 
 let lastAdminHelpTopic = null;
 
@@ -36,16 +51,16 @@ const ADMIN_HELP_TOPICS = [
     id: "admin-create",
     keywords: ["crear administrador", "crear un administrador", "agregar administrador", "agregar un administrador", "agrego un administrador", "añadir administrador", "nuevo administrador", "otro administrador", "sumar un administrador", "crear usuario", "nuevo usuario", "otro usuario", "añadir usuario", "crear una cuenta", "nuevo perfil"],
     responses: [
-      "Para sumar a otra persona al panel, abre “Agregar nuevo administrador”, elige su usuario y contraseña y pulsa “Crear perfil”. Ojo: el nombre de usuario debe ser único.",
-      "¡Claro! En el panel, despliega “Agregar nuevo administrador”, completa usuario y contraseña y selecciona “Crear perfil”. Si te avisa que ya existe, prueba con otro nombre."
+      "Para sumar a otra persona, abre “Agregar nuevo administrador”, completa usuario y contraseña y pulsa “Crear perfil”. Después revisa la propuesta: el perfil solo se guarda cuando confirmas. En esta demo queda solo en el navegador.",
+      "¡Claro! Despliega “Agregar nuevo administrador” y completa el formulario, pero no pegues la contraseña en el chat. Al preparar el perfil podrás revisar la propuesta y confirmar; los nombres repetidos no se aceptan."
     ]
   },
   {
     id: "admin-credentials",
     keywords: ["credenciales", "cambiar contraseña", "actualizar contraseña", "cambiar usuario", "editar perfil", "cambiar mi clave", "cambiar clave", "clave", "mi contraseña", "mi usuario"],
     responses: [
-      "Puedes cambiar ambos datos desde “Editar credenciales”: confirma tu usuario y contraseña actuales, escribe los nuevos y pulsa “Guardar cambios”. Tu sesión seguirá abierta con el nuevo usuario.",
-      "Para renovar tu acceso, abre “Editar credenciales”. El formulario te pide primero los datos actuales y después el nuevo usuario y contraseña; al guardar, los cambios quedan aplicados."
+      "Puedes cambiar ambos datos desde “Editar credenciales”: confirma tu usuario y contraseña actuales y escribe los nuevos. El panel te mostrará una vista previa antes de guardar el cambio.",
+      "Para renovar tu acceso, abre “Editar credenciales”. Al preparar el cambio podrás revisar el nuevo usuario; las credenciales solo se actualizan cuando confirmas."
     ]
   },
   {
@@ -71,6 +86,15 @@ const ADMIN_HELP_TOPICS = [
     responses: [
       "El panel Admin reúne la gestión de perfiles y sesiones. También muestra accesos a Solicitudes, Servicios y Clientes, aunque esas tarjetas todavía son informativas y no gestionan datos.",
       "Desde Admin puedes crear otros perfiles, actualizar tus credenciales y revisar sesiones. Las tarjetas de Solicitudes, Servicios y Clientes indican áreas previstas, pero aún no tienen herramientas de gestión."
+    ]
+  },
+  {
+    id: "local-editor",
+    priority: 10,
+    keywords: ["editar el sitio", "editar inicio", "editar servicios", "editar precios", "editar la pagina", "cambiar contenido", "modificar contenido", "guardar cambios", "confirmar cambios", "publicar cambios", "guardar en este navegador"],
+    responses: [
+      "Puedes pedirme un cambio con tus palabras o prepararlo en “Preparar un cambio del sitio”. Primero te mostraré una vista previa; solo al pulsar “Confirmar y guardar” se aplicará. En esta versión queda guardado en este navegador, no publicado en Internet.",
+      "Sí, puedo ayudarte a modificar el contenido de Inicio o Servicios. Descríbeme qué dato quieres cambiar y por cuál; revisarás la propuesta antes de confirmarla. Este modo local guarda en el navegador, pero no sube el sitio."
     ]
   },
   {
@@ -175,8 +199,8 @@ const ADMIN_HELP_TOPICS = [
     id: "admin-limits",
     keywords: ["editar servicios", "editar precios", "cambiar catalogo", "gestionar clientes", "administrar solicitudes", "bandeja de entrada", "modificar pagina", "editar inicio"],
     responses: [
-      "Buena pregunta. Aunque el panel muestra tarjetas de Solicitudes, Servicios y Clientes, esas áreas todavía son informativas: aún no permiten editar el sitio, el catálogo ni gestionar datos de clientes.",
-      "Por ahora no hay herramientas en Admin para cambiar el contenido de Inicio, modificar precios o gestionar solicitudes y clientes. El panel sí permite administrar perfiles y sesiones."
+      "Ahora puedes preparar cambios para el contenido de Inicio y Servicios, incluidos planes y precios, desde “Preparar un cambio del sitio”. Se muestra una vista previa y tienes que confirmar; esta versión solo guarda en el navegador. Las tarjetas de Solicitudes y Clientes siguen siendo informativas.",
+      "Para editar el catálogo o la portada, prepara el cambio desde este panel y confirma la vista previa. Se guarda localmente, no se publica; la gestión de solicitudes y clientes aún no está implementada."
     ]
   },
   {
@@ -198,8 +222,8 @@ const ADMIN_HELP_TOPICS = [
 ];
 
 const ADMIN_HELP_FOLLOW_UPS = {
-  "admin-create": "Cuando tengas usuario y contraseña listos, abre el desplegable “Agregar nuevo administrador” en este mismo panel. Los nombres de usuario duplicados no se aceptan.",
-  "admin-credentials": "Ten a mano tus credenciales actuales: el formulario las verifica antes de guardar las nuevas. Después de guardar, tu sesión queda con el usuario actualizado.",
+  "admin-create": "Cuando tengas usuario y contraseña listos, abre el desplegable “Agregar nuevo administrador”. El panel te mostrará los datos de la cuenta (sin revelar la contraseña) y pedirá confirmación antes de guardarla localmente.",
+  "admin-credentials": "Ten a mano tus credenciales actuales: el formulario las verifica antes de preparar los nuevos datos. Revísalos y confirma para aplicar el cambio en este navegador.",
   "admin-login": "La página de acceso está enlazada como “Admin” en la navegación. Si ya estás dentro, evita cerrar la sesión antes de actualizar las credenciales.",
   "admin-sessions": "Haz clic en una sesión para seleccionarla; también puedes enfocarla y usar Enter o espacio. El botón de sesiones no autorizadas cambia su alcance si hay elementos seleccionados.",
   "admin-overview": "Las secciones que hoy permiten acciones son la administración de perfiles y las sesiones. El resto del panel sirve como referencia de funciones que se podrían implementar más adelante.",
@@ -215,10 +239,415 @@ const ADMIN_HELP_FOLLOW_UPS = {
   "service-ecommerce": "Si tienes necesidades específicas de pagos o inventario, descríbelas en el campo de mensaje del formulario para que se consideren al cotizar.",
   "service-ai": "Las tres opciones rápidas preparan mensajes distintos para WhatsApp. La interacción no ocurre en una conversación de IA embebida.",
   "contact": "El formulario solicita nombre, correo y mensaje; el teléfono y el servicio son opcionales. El contacto se abre mediante WhatsApp y correo.",
-  "admin-limits": "Las funciones que sí están implementadas son crear perfiles de administrador, cambiar las credenciales del perfil activo y gestionar sesiones.",
+  "admin-limits": "Puedes editar contenido de Inicio y Servicios en modo local, además de crear perfiles, cambiar credenciales y gestionar sesiones. Las solicitudes y clientes aún no tienen una bandeja de administración.",
   "admin-clients": "La administración de clientes y conversaciones aún no está implementada; puedo ayudarte a localizar las opciones de contacto que sí existen en Servicios.",
-  "assistant": "Puedo resolver dudas usando la información del propio proyecto, pero no consulto Internet ni un modelo de IA. Si necesitas algo fuera de Admin, Inicio o Servicios, dime y trataré de orientarte con lo disponible."
+  "assistant": "Puedo resolver dudas usando la información del propio proyecto, pero no consulto Internet ni un modelo de IA. Si necesitas algo fuera de Admin, Inicio o Servicios, dime y trataré de orientarte con lo disponible.",
+  "local-editor": "Puedes editar títulos, descripciones, datos de proyectos, planes, precios, características, contacto y consultas rápidas. Las propuestas requieren confirmación y solo se guardan en este navegador."
 };
+
+const CONTENT_FIELD_LABELS = {
+  "home.title": "Inicio · título principal",
+  "home.description": "Inicio · descripción principal",
+  "home.servicesButton": "Inicio · botón de Servicios",
+  "home.adminButton": "Inicio · botón de Admin",
+  "home.projectsLabel": "Inicio · etiqueta de proyectos",
+  "home.projectsTitle": "Inicio · título de proyectos",
+  "home.projectsDescription": "Inicio · descripción de proyectos",
+  "services.title": "Servicios · título principal",
+  "services.description": "Servicios · introducción",
+  "services.aiTitle": "Servicios · título de asistencia",
+  "services.aiDescription": "Servicios · descripción de asistencia",
+  "services.aiButton": "Servicios · botón de asistencia",
+  "services.aiPanelTitle": "Servicios · título de consultas rápidas",
+  "services.contactTitle": "Servicios · título de contacto",
+  "services.phoneLabel": "Servicios · etiqueta del teléfono",
+  "services.phone": "Servicios · teléfono de contacto",
+  "services.whatsapp": "Servicios · número de WhatsApp",
+  "services.emailLabel": "Servicios · etiqueta del correo",
+  "services.email": "Servicios · correo de contacto",
+  "services.contactNote": "Servicios · nota de contacto",
+  "services.nameLabel": "Servicios · etiqueta del nombre",
+  "services.namePlaceholder": "Servicios · ejemplo para el nombre",
+  "services.emailFieldLabel": "Servicios · etiqueta del correo del formulario",
+  "services.emailPlaceholder": "Servicios · ejemplo para el correo",
+  "services.phoneFieldLabel": "Servicios · etiqueta del teléfono del formulario",
+  "services.phonePlaceholder": "Servicios · ejemplo para el teléfono",
+  "services.packageFieldLabel": "Servicios · etiqueta del plan",
+  "services.packagePlaceholder": "Servicios · opción inicial del selector",
+  "services.otherPackageLabel": "Servicios · opción Otro del selector",
+  "services.messageLabel": "Servicios · etiqueta del mensaje",
+  "services.messagePlaceholder": "Servicios · ejemplo para el mensaje",
+  "services.submitLabel": "Servicios · botón del formulario",
+  "services.quoteButtonLabel": "Servicios · botón para cotizar un plan",
+  "services.requestGreeting": "Servicios · saludo de la solicitud",
+  "services.requestSubject": "Servicios · asunto del correo de solicitud",
+  "services.aiSentMessage": "Servicios · confirmación de consulta rápida",
+  "services.requestSentMessage": "Servicios · confirmación de solicitud",
+  "services.requiredFieldsMessage": "Servicios · aviso de campos obligatorios",
+  "services.invalidEmailMessage": "Servicios · aviso de correo no válido"
+};
+
+function getSiteContentFields() {
+  const fields = Object.entries(CONTENT_FIELD_LABELS).map(([path, label]) => ({ path, label }));
+
+  siteContent.home.projects.forEach((project, index) => {
+    const prefix = `home.projects.${index}`;
+    ["name", "description", "url", "image", "alt"].forEach((key) => {
+      fields.push({ path: `${prefix}.${key}`, label: `Inicio · ${project.name} · ${key}` });
+    });
+  });
+
+  siteContent.services.packages.forEach((pack, index) => {
+    const prefix = `services.packages.${index}`;
+    fields.push({ path: `${prefix}.name`, label: `Servicios · ${pack.name} · nombre` });
+    fields.push({ path: `${prefix}.price`, label: `Servicios · ${pack.name} · precio` });
+    fields.push({ path: `${prefix}.features`, label: `Servicios · ${pack.name} · características (una por línea)` });
+    fields.push({ path: `${prefix}.observation`, label: `Servicios · ${pack.name} · descripción` });
+  });
+
+  siteContent.services.aiOptions.forEach((option, index) => {
+    const prefix = `services.aiOptions.${index}`;
+    fields.push({ path: `${prefix}.label`, label: `Servicios · consulta rápida ${index + 1} · nombre` });
+    fields.push({ path: `${prefix}.prompt`, label: `Servicios · consulta rápida ${index + 1} · mensaje` });
+  });
+
+  return fields;
+}
+
+function getValueAtPath(object, path) {
+  return path.split(".").reduce((value, key) => value[key], object);
+}
+
+function setValueAtPath(object, path, value) {
+  const keys = path.split(".");
+  const property = keys.pop();
+  const target = keys.reduce((current, key) => current[key], object);
+  target[property] = value;
+}
+
+function isSafeContentValue(path, value) {
+  if (typeof value !== "string" || !value.trim()) return false;
+  if (/\.(url|image)$/.test(path)) {
+    return /^(https?:\/\/|\.{1,2}\/|\/)/i.test(value.trim());
+  }
+  if (path === "services.email") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+  if (path === "services.phone" || path === "services.whatsapp") {
+    return /^\+?\d{8,15}$/.test(value.trim().replace(/[\s()-]/g, ""));
+  }
+  return true;
+}
+
+function renderContentFieldOptions() {
+  if (!siteContentField) return;
+  siteContentField.replaceChildren();
+  siteContentOptions?.replaceChildren();
+
+  getSiteContentFields().forEach(({ path, label }) => {
+    const option = document.createElement("option");
+    option.value = path;
+    option.textContent = label;
+    siteContentField.appendChild(option);
+
+    const menuOption = document.createElement("button");
+    menuOption.type = "button";
+    menuOption.className = "custom-select-option";
+    menuOption.id = `site-content-option-${siteContentOptions.children.length}`;
+    menuOption.dataset.value = path;
+    menuOption.setAttribute("role", "option");
+    menuOption.setAttribute("aria-selected", "false");
+    menuOption.textContent = label;
+    menuOption.addEventListener("click", () => selectContentField(path));
+    siteContentOptions?.appendChild(menuOption);
+  });
+
+  updateContentFieldValue();
+}
+
+function selectContentField(path) {
+  if (!siteContentField) return;
+  siteContentField.value = path;
+  updateContentFieldValue();
+  closeContentFieldMenu();
+  siteContentSelectTrigger?.focus();
+}
+
+function openContentFieldMenu() {
+  if (!siteContentOptions || !siteContentSelectTrigger) return;
+  siteContentOptions.classList.remove("hidden");
+  siteContentSelectTrigger.setAttribute("aria-expanded", "true");
+  const selectedOption = siteContentOptions.querySelector('[aria-selected="true"]') || siteContentOptions.firstElementChild;
+  selectedOption?.scrollIntoView({ block: "nearest" });
+}
+
+function closeContentFieldMenu() {
+  if (!siteContentOptions || !siteContentSelectTrigger) return;
+  siteContentOptions.classList.add("hidden");
+  siteContentSelectTrigger.setAttribute("aria-expanded", "false");
+}
+
+function updateContentFieldValue() {
+  if (!siteContentField || !siteContentValue) return;
+  const value = getValueAtPath(siteContent, siteContentField.value);
+  siteContentValue.value = Array.isArray(value) ? value.join("\n") : value;
+
+  if (siteContentSelectLabel) {
+    siteContentSelectLabel.textContent = siteContentField.selectedOptions[0]?.textContent || "Selecciona un dato";
+  }
+  siteContentOptions?.querySelectorAll(".custom-select-option").forEach((option) => {
+    const isSelected = option.dataset.value === siteContentField.value;
+    option.setAttribute("aria-selected", String(isSelected));
+  });
+}
+
+function stageAdminChange(change) {
+  if (pendingAdminChange) {
+    return false;
+  }
+
+  pendingAdminChange = change;
+  changeTitle.textContent = change.title;
+  changeDescription.textContent = change.description;
+  changePreview.classList.remove("hidden");
+  changePreview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  return true;
+}
+
+function stageSiteContentChange(path, rawValue, source) {
+  const value = Array.isArray(getValueAtPath(siteContent, path))
+    ? rawValue.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean)
+    : rawValue.trim();
+
+  if (!Array.isArray(value) && !isSafeContentValue(path, value)) {
+    return false;
+  }
+
+  const updatedContent = JSON.parse(JSON.stringify(siteContent));
+  const previousValue = getValueAtPath(siteContent, path);
+  setValueAtPath(updatedContent, path, value);
+  if (path === "services.phone" || path === "services.whatsapp") {
+    const phoneDigits = value.replace(/\D/g, "");
+    if (path === "services.phone") {
+      updatedContent.services.whatsapp = phoneDigits;
+    } else {
+      updatedContent.services.phone = `+${phoneDigits}`;
+    }
+  }
+  const field = getSiteContentFields().find((entry) => entry.path === path);
+  const readablePreviousValue = Array.isArray(previousValue) ? previousValue.join(", ") : previousValue;
+  const readableValue = Array.isArray(value) ? value.join(", ") : value;
+  const phoneSyncNotice = path === "services.phone" || path === "services.whatsapp"
+    ? "\nTambién se actualizará el enlace de WhatsApp y el número visible para mantenerlos sincronizados."
+    : "";
+  return stageAdminChange({
+    type: "site-content",
+    content: updatedContent,
+    title: "Revisa el cambio propuesto",
+    description: `${field?.label || path}\nAntes: “${readablePreviousValue}”\nNuevo: “${readableValue}”.${phoneSyncNotice}${source === "chat" ? "\nPropuesta preparada a partir de tu mensaje." : ""}`
+  });
+}
+
+function confirmPendingAdminChange() {
+  if (!pendingAdminChange) return;
+
+  try {
+    if (pendingAdminChange.type === "site-content") {
+      window.ProgramStyleContent.save(pendingAdminChange.content);
+      siteContent = pendingAdminChange.content;
+      renderContentFieldOptions();
+      siteContentForm?.reset();
+      updateContentFieldValue();
+      addChatMessage("¡Listo! El cambio quedó guardado en este navegador. Recarga Inicio o Servicios para verlo. Todavía no está publicado ni subido al sitio.", "assistant");
+    } else if (pendingAdminChange.type === "admin-create") {
+      const users = getStoredUsers();
+      if (users.some((user) => user.usuario === pendingAdminChange.user.usuario)) {
+        addChatMessage("No guardé la cuenta: ese usuario ya existe. Cancela esta propuesta y prepara otra con un nombre distinto.", "assistant");
+        return;
+      }
+      users.push(pendingAdminChange.user);
+      saveUsers(users);
+      createAdminForm?.reset();
+      setMessage(createAdminMessage, "Nuevo administrador guardado en este navegador.", "success");
+      addChatMessage(`La cuenta “${pendingAdminChange.user.usuario}” quedó guardada localmente después de tu confirmación. No se ha publicado ni sincronizado con otros dispositivos.`, "assistant");
+    } else if (pendingAdminChange.type === "admin-profile") {
+      const users = getStoredUsers();
+      const currentIndex = users.findIndex((user) => user.usuario === pendingAdminChange.currentUser);
+      if (currentIndex < 0) {
+        addChatMessage("No guardé el cambio porque el perfil actual ya no está disponible.", "assistant");
+        return;
+      }
+      users[currentIndex] = pendingAdminChange.profile;
+      saveUsers(users);
+
+      const sessions = getStoredSessions().map((entry) =>
+        entry.user === pendingAdminChange.currentUser ? { ...entry, user: pendingAdminChange.profile.usuario } : entry
+      );
+      saveSessions(sessions);
+      ADMIN_CREDENTIALS = { ...pendingAdminChange.profile };
+      setCurrentSession(pendingAdminChange.profile.usuario);
+      editAdminForm?.reset();
+      updateSessionList();
+      setMessage(editAdminMessage, "Credenciales guardadas en este navegador.", "success");
+      addChatMessage("Credenciales actualizadas tras tu confirmación. El cambio es local a este navegador.", "assistant");
+    }
+  } catch (error) {
+    addChatMessage(`No se pudo guardar el cambio en este navegador: ${error.message}`, "assistant");
+    return;
+  }
+
+  pendingAdminChange = null;
+  changePreview.classList.add("hidden");
+}
+
+function cancelPendingAdminChange() {
+  if (!pendingAdminChange) return;
+  pendingAdminChange = null;
+  changePreview.classList.add("hidden");
+  createAdminForm?.reset();
+  editAdminForm?.reset();
+  addChatMessage("Propuesta cancelada. No guardé ningún cambio.", "assistant");
+}
+
+function getRequestedContentChange(question) {
+  const normalisedQuestion = normaliseChatText(question);
+  if (!/\b(cambia|cambiar|actualiza|actualizar|modifica|modificar|edita|editar|pon|poner|reemplaza|reemplazar)\b/.test(normalisedQuestion)) {
+    return null;
+  }
+
+  const matches = Array.from(question.matchAll(/\b(?:a|por)\s+/gi));
+  if (!matches.length) return null;
+  const lastConnector = matches[matches.length - 1];
+  const value = question.slice(lastConnector.index + lastConnector[0].length).trim().replace(/[?.!]+$/, "");
+  if (!value) return null;
+
+  let path = null;
+  const selectedProjectIndex = siteContent.home.projects.findIndex((project) =>
+    normalisedQuestion.includes(normaliseChatText(project.name))
+  );
+  const selectedPackageIndex = siteContent.services.packages.findIndex((pack) => {
+    const name = normaliseChatText(pack.name);
+    if (normalisedQuestion.includes(name)) return true;
+    if (name.includes("landing") && /\blanding\b/.test(normalisedQuestion)) return true;
+    if (name.includes("corporativo") && /\b(corporativo|empresa)\b/.test(normalisedQuestion)) return true;
+    if (name.includes("e commerce") && /\b(e commerce|tienda en linea|tienda online)\b/.test(normalisedQuestion)) return true;
+    return name.includes("descuento") && /\b(descuento|promocion|oferta)\b/.test(normalisedQuestion);
+  });
+
+  if (selectedProjectIndex >= 0) {
+    const property = /\b(nombre|titulo)\b/.test(normalisedQuestion)
+      ? "name"
+      : /\b(link|enlace|url|direccion)\b/.test(normalisedQuestion)
+        ? "url"
+        : /\b(imagen|foto)\b/.test(normalisedQuestion)
+          ? "image"
+          : "description";
+    path = `home.projects.${selectedProjectIndex}.${property}`;
+  } else if (selectedPackageIndex >= 0) {
+    const property = /\b(precio|valor|costo)\b/.test(normalisedQuestion)
+      ? "price"
+      : /\b(caracteristica|incluye|incluyen|beneficio)\b/.test(normalisedQuestion)
+        ? "features"
+        : /\b(nombre|titulo)\b/.test(normalisedQuestion)
+          ? "name"
+          : "observation";
+    path = `services.packages.${selectedPackageIndex}.${property}`;
+  } else if (/\b(correo|email)\b/.test(normalisedQuestion)) {
+    path = "services.email";
+  } else if (/\b(whatsapp|telefono)\b/.test(normalisedQuestion)) {
+    path = "services.phone";
+  } else if (/\b(precio|valor|costo)\b/.test(normalisedQuestion) && selectedPackageIndex < 0) {
+    return null;
+  } else if (/\b(titulo|encabezado)\b/.test(normalisedQuestion)) {
+    path = /\b(asistencia|ia)\b/.test(normalisedQuestion)
+      ? "services.aiTitle"
+      : /\b(contacto)\b/.test(normalisedQuestion)
+        ? "services.contactTitle"
+        : /\b(proyectos|casos de exito)\b/.test(normalisedQuestion)
+          ? "home.projectsTitle"
+          : /\b(servicios|planes|catalogo)\b/.test(normalisedQuestion)
+            ? "services.title"
+            : "home.title";
+  } else if (/\b(proyectos|casos de exito)\b/.test(normalisedQuestion) && /\b(descripcion|texto)\b/.test(normalisedQuestion)) {
+    path = "home.projectsDescription";
+  } else if (/\b(descripcion|texto|introduccion)\b/.test(normalisedQuestion)) {
+    path = /\b(contacto|cotizacion)\b/.test(normalisedQuestion)
+      ? "services.contactNote"
+      : /\b(asistencia|ia)\b/.test(normalisedQuestion)
+        ? "services.aiDescription"
+        : /\b(servicios|planes|catalogo)\b/.test(normalisedQuestion)
+          ? "services.description"
+          : /\b(inicio|portada|principal)\b/.test(normalisedQuestion)
+            ? "home.description"
+            : null;
+  } else if (/\b(etiqueta|boton|nombre del boton)\b/.test(normalisedQuestion)) {
+    path = /\b(contacto|solicitud)\b/.test(normalisedQuestion)
+      ? "services.submitLabel"
+      : /\b(admin|administrador)\b/.test(normalisedQuestion)
+        ? "home.adminButton"
+        : /\b(servicios)\b/.test(normalisedQuestion)
+          ? "home.servicesButton"
+          : /\b(cotizar|plan)\b/.test(normalisedQuestion)
+            ? "services.quoteButtonLabel"
+            : "services.aiButton";
+  }
+
+  return path ? { path, value } : null;
+}
+
+function getSafeCreateAdminGuidance() {
+  const createPanel = document.getElementById("create-admin-panel");
+  createPanel?.classList.remove("hidden-panel");
+  createPanel?.scrollIntoView({ behavior: "smooth", block: "center" });
+  return "Puedo acompañarte, pero no escribas contraseñas en el chat. Abre “Agregar nuevo administrador”, completa el formulario del panel y pulsa “Crear perfil”; te mostraré una vista previa y la cuenta solo se guardará cuando confirmes.";
+}
+
+function getDynamicAdminHelpResponse(topic) {
+  const packages = siteContent.services.packages;
+
+  if (topic.id === "service-prices") {
+    const prices = packages.map(({ name, price }) => `${name}: ${price}`).join("; ");
+    return `Los precios que aparecen ahora en Servicios son: ${prices}. Son los valores guardados en este navegador y pueden variar según el proyecto.`;
+  }
+
+  if (topic.id === "service-overview") {
+    const names = packages.map(({ name }) => name).join(", ");
+    return `En Servicios tienes estas opciones: ${names}. Puedes editar sus datos desde “Preparar un cambio del sitio”; los cambios solo se aplican tras confirmarlos.`;
+  }
+
+  const packageIndexByTopic = {
+    "service-landing": 0,
+    "service-corporate": 1,
+    "service-discount": 2,
+    "service-ecommerce": 3
+  };
+  const packageIndex = packageIndexByTopic[topic.id];
+  if (packageIndex !== undefined && packages[packageIndex]) {
+    const selectedPackage = packages[packageIndex];
+    const features = selectedPackage.features.join("; ");
+    return `${selectedPackage.name}: ${selectedPackage.price}. ${selectedPackage.observation} Incluye: ${features}.`;
+  }
+
+  if (topic.id === "home-projects") {
+    const projects = siteContent.home.projects
+      .map(({ name, description }) => `${name}: ${description}`)
+      .join(" ");
+    return `En Inicio aparecen estos proyectos: ${projects}`;
+  }
+
+  if (topic.id === "home") {
+    return `La portada de Inicio dice “${siteContent.home.title}”. ${siteContent.home.description} Desde allí puedes usar “${siteContent.home.servicesButton}” o bajar a “${siteContent.home.projectsTitle}”.`;
+  }
+
+  if (topic.id === "contact") {
+    return `Los datos actuales de contacto en Servicios son ${siteContent.services.phone} y ${siteContent.services.email}. ${siteContent.services.contactNote}`;
+  }
+
+  if (topic.id === "service-ai") {
+    const options = siteContent.services.aiOptions.map(({ label }) => label).join(", ");
+    return `${siteContent.services.aiTitle}: ${siteContent.services.aiDescription} Las consultas rápidas disponibles son: ${options}. Al elegir una se prepara el mensaje para WhatsApp.`;
+  }
+
+  return null;
+}
 
 function getStoredUsers() {
   const stored = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || "null");
@@ -259,22 +688,33 @@ function updateSessionList() {
 
   const sessions = getStoredSessions();
   if (!sessions.length) {
-    sessionList.innerHTML = '<p class="panel-message">No hay sesiones registradas.</p>';
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "panel-message";
+    emptyMessage.textContent = "No hay sesiones registradas.";
+    sessionList.replaceChildren(emptyMessage);
     return;
   }
 
-  sessionList.innerHTML = sessions
-    .map((entry) => {
-      const statusClass = entry.status === "active" ? "active" : "unauthorized";
-      const label = entry.status === "active" ? "Activa" : "No autorizada";
-      return `
-        <div class="session-item" data-user="${entry.user}" data-status="${entry.status}" tabindex="0">
-          <strong>${entry.user}</strong>
-          <span class="badge ${statusClass}">${label}</span>
-        </div>
-      `;
-    })
-    .join("");
+  const sessionItems = sessions.map((entry) => {
+    const statusClass = entry.status === "active" ? "active" : "unauthorized";
+    const label = entry.status === "active" ? "Activa" : "No autorizada";
+    const item = document.createElement("div");
+    item.className = "session-item";
+    item.dataset.user = entry.user;
+    item.dataset.status = entry.status;
+    item.tabIndex = 0;
+
+    const user = document.createElement("strong");
+    user.textContent = entry.user;
+
+    const badge = document.createElement("span");
+    badge.className = `badge ${statusClass}`;
+    badge.textContent = label;
+
+    item.append(user, badge);
+    return item;
+  });
+  sessionList.replaceChildren(...sessionItems);
 
   sessionList.querySelectorAll(".session-item").forEach((item) => {
     item.addEventListener("click", () => {
@@ -338,7 +778,7 @@ function normaliseChatText(text) {
 function getAdminHelpResponse(question) {
   const normalisedQuestion = normaliseChatText(question);
   if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal)$/.test(normalisedQuestion)) {
-    return "¡Hola! Aquí estoy para ayudarte. Puedes preguntarme por Admin, Inicio o Servicios; por ejemplo, cómo gestionar accesos, qué planes hay o dónde solicitar una cotización.";
+    return "¡Hola! Aquí estoy para ayudarte. Puedes preguntarme por Admin, Inicio o Servicios; también puedes pedirme un cambio, revisar la propuesta y decidir si quieres guardarla localmente.";
   }
 
   if (/^(gracias|muchas gracias|te agradezco|perfecto gracias|listo gracias)$/.test(normalisedQuestion)) {
@@ -346,7 +786,33 @@ function getAdminHelpResponse(question) {
   }
 
   if (/^(que puedes hacer|en que me ayudas|como me ayudas|ayuda|ayudame)$/.test(normalisedQuestion)) {
-    return "Puedo guiarte por el panel Admin, explicar el contenido de Inicio, comparar los servicios y precios, y encontrar las opciones de contacto. También te diré con claridad cuando una función todavía no exista.";
+    return "Puedo guiarte por Admin, Inicio y Servicios; editar títulos, descripciones, proyectos, precios, características y datos de contacto; y ayudarte a preparar cuentas admin. Antes de guardar cualquier propuesta te pediré confirmación. En este modo los cambios solo quedan en este navegador, no se publican.";
+  }
+
+  if (/\b(crear|agregar|añadir|sumar)\b/.test(normalisedQuestion) && /\b(admin|administrador|usuario|cuenta)\b/.test(normalisedQuestion)) {
+    lastAdminHelpTopic = "admin-create";
+    return getSafeCreateAdminGuidance();
+  }
+
+  const requestedChange = getRequestedContentChange(question);
+  if (requestedChange) {
+    lastAdminHelpTopic = "local-editor";
+    if (pendingAdminChange) return "Primero confirma o cancela la propuesta que ya está pendiente; así no se mezclan cambios.";
+
+    return stageSiteContentChange(requestedChange.path, requestedChange.value, "chat")
+      ? "Preparé una vista previa del cambio. Revísala y pulsa “Confirmar y guardar” si estás de acuerdo; puedes cancelarla sin guardar. Se quedará en este navegador, no se publicará."
+      : "No pude preparar ese cambio: revisa que el contenido no esté vacío y que los enlaces, el correo o el número tengan un formato válido.";
+  }
+
+  if (
+    /\b(cambia|cambiar|actualiza|actualizar|modifica|modificar|edita|editar|pon|poner|reemplaza|reemplazar)\b/.test(normalisedQuestion) &&
+    /\b(titulo|precio|descripcion|proyecto|servicio|contacto|correo|email|telefono|whatsapp|caracteristica|boton|nombre)\b/.test(normalisedQuestion)
+  ) {
+    lastAdminHelpTopic = "local-editor";
+    if (/\b(precio|valor|costo)\b/.test(normalisedQuestion)) {
+      return "¿De cuál plan quieres cambiar el precio: Landing Page, Sitio Corporativo, promoción o E-commerce? Indica también el valor nuevo y te prepararé la vista previa.";
+    }
+    return "¡Dale! Dime el dato y su nuevo valor, por ejemplo: “Cambia el título de Inicio a Sitios para crecer”. También puedes elegir cualquier campo en “Preparar un cambio del sitio”. Primero verás la propuesta; solo se guarda al confirmarla.";
   }
 
   const topic = ADMIN_HELP_TOPICS
@@ -379,7 +845,7 @@ function getAdminHelpResponse(question) {
 
   if (topic) {
     lastAdminHelpTopic = topic.id;
-    return topic.responses[Math.floor(Math.random() * topic.responses.length)];
+    return getDynamicAdminHelpResponse(topic) || topic.responses[Math.floor(Math.random() * topic.responses.length)];
   }
 
   if (
@@ -483,10 +949,21 @@ if (createAdminForm) {
       return;
     }
 
-    users.push({ usuario: nombre, password });
-    saveUsers(users);
-    setMessage(createAdminMessage, "Nuevo administrador creado correctamente.", "success");
-    createAdminForm.reset();
+    if (pendingAdminChange) {
+      setMessage(createAdminMessage, "Confirma o cancela la propuesta pendiente antes de preparar otra.", "error");
+      return;
+    }
+
+    const staged = stageAdminChange({
+      type: "admin-create",
+      user: { usuario: nombre, password },
+      title: "Confirma la nueva cuenta administrativa",
+      description: `Se creará el usuario “${nombre}”. La contraseña no se muestra en la vista previa.`
+    });
+    if (staged) {
+      setMessage(createAdminMessage, "Propuesta lista. La cuenta solo se guardará al confirmar.", "success");
+      addChatMessage(`Tengo lista la propuesta para crear “${nombre}”. Revisa la vista previa y confirma si quieres guardarla localmente.`, "assistant");
+    }
   });
 }
 
@@ -527,22 +1004,104 @@ if (editAdminForm) {
       return;
     }
 
-    const profileIndex = users.indexOf(currentProfile);
-    users[profileIndex] = { usuario: nuevoUsuario, password: nuevaPassword };
-    saveUsers(users);
+    if (pendingAdminChange) {
+      setMessage(editAdminMessage, "Confirma o cancela la propuesta pendiente antes de preparar otra.", "error");
+      return;
+    }
 
-    const sessions = getStoredSessions().map((entry) =>
-      entry.user === currentUser ? { ...entry, user: nuevoUsuario } : entry
-    );
-    saveSessions(sessions);
-
-    ADMIN_CREDENTIALS = { usuario: nuevoUsuario, password: nuevaPassword };
-    setCurrentSession(nuevoUsuario);
-
-    setMessage(editAdminMessage, "Perfil actualizado correctamente.", "success");
-    editAdminForm.reset();
-    updateSessionList();
+    const staged = stageAdminChange({
+      type: "admin-profile",
+      currentUser,
+      profile: { usuario: nuevoUsuario, password: nuevaPassword },
+      title: "Confirma la actualización de credenciales",
+      description: `El usuario “${currentUser}” cambiará a “${nuevoUsuario}”. La contraseña no se muestra en la vista previa.`
+    });
+    if (staged) {
+      setMessage(editAdminMessage, "Propuesta lista. Las credenciales solo cambiarán al confirmar.", "success");
+      addChatMessage("Preparé la actualización de credenciales. Revisa los usuarios en la vista previa y confirma para guardarla en este navegador.", "assistant");
+    }
   });
+}
+
+if (siteContentSelectTrigger) {
+  siteContentSelectTrigger.addEventListener("click", () => {
+    const isExpanded = siteContentSelectTrigger.getAttribute("aria-expanded") === "true";
+    if (isExpanded) closeContentFieldMenu();
+    else openContentFieldMenu();
+  });
+
+  siteContentSelectTrigger.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeContentFieldMenu();
+      return;
+    }
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openContentFieldMenu();
+      const options = Array.from(siteContentOptions.querySelectorAll(".custom-select-option"));
+      const selectedIndex = options.findIndex((option) => option.dataset.value === siteContentField.value);
+      const nextIndex = event.key === "ArrowUp"
+        ? Math.max(0, selectedIndex - 1)
+        : event.key === "ArrowDown"
+          ? Math.min(options.length - 1, selectedIndex + 1)
+          : selectedIndex;
+      options[nextIndex]?.focus();
+    }
+  });
+}
+
+if (siteContentOptions) {
+  siteContentOptions.addEventListener("keydown", (event) => {
+    const options = Array.from(siteContentOptions.querySelectorAll(".custom-select-option"));
+    const currentIndex = options.indexOf(document.activeElement);
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowDown") nextIndex = Math.min(options.length - 1, currentIndex + 1);
+    else if (event.key === "ArrowUp") nextIndex = Math.max(0, currentIndex - 1);
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = options.length - 1;
+    else if (event.key === "Escape") {
+      closeContentFieldMenu();
+      siteContentSelectTrigger?.focus();
+      return;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    options[nextIndex]?.focus();
+  });
+}
+
+if (siteContentSelect) {
+  document.addEventListener("click", (event) => {
+    if (!siteContentSelect.contains(event.target)) closeContentFieldMenu();
+  });
+}
+
+if (siteContentForm && siteContentField && siteContentValue) {
+  siteContentForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (pendingAdminChange) {
+      addChatMessage("Confirma o cancela la propuesta pendiente antes de preparar otra.", "assistant");
+      return;
+    }
+
+    if (stageSiteContentChange(siteContentField.value, siteContentValue.value, "editor")) {
+      addChatMessage("Ya está lista la vista previa. Revísala y confirma si quieres guardar este cambio localmente.", "assistant");
+    } else {
+      addChatMessage("No pude preparar el cambio. Comprueba que no esté vacío y que el enlace, correo o teléfono tenga un formato válido.", "assistant");
+    }
+  });
+}
+
+if (confirmChangeBtn) {
+  confirmChangeBtn.addEventListener("click", confirmPendingAdminChange);
+}
+
+if (cancelChangeBtn) {
+  cancelChangeBtn.addEventListener("click", cancelPendingAdminChange);
 }
 
 if (adminChatForm && adminChatInput) {
@@ -615,6 +1174,7 @@ if (panelToggles.length) {
 }
 
 ensureAdminSessionState();
+renderContentFieldOptions();
 
 if (getCurrentSession()?.loggedIn) {
   if (loginSection) loginSection.classList.add("hidden");

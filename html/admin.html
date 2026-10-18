@@ -77,40 +77,65 @@
 
         <div class="admin-sections">
           <section class="panel-section admin-assistant" aria-labelledby="admin-assistant-title">
-            <div class="assistant-layout">
-              <div class="assistant-chat">
-                <h3 id="admin-assistant-title">Asistente administrativo</h3>
-                <p class="assistant-description">Pregúntame con tus palabras sobre Admin, Inicio o Servicios. Te guío con lo que ya está disponible y te aviso si algo aún está pendiente.</p>
+            <div class="assistant-chat">
+              <h3 id="admin-assistant-title">Asistente administrativo</h3>
+              <p class="assistant-description">Pregúntame con tus palabras sobre Admin, Inicio o Servicios. Puedo preparar cambios para que los revises y confirmes antes de guardarlos.</p>
 
-                <div id="admin-chat-messages" class="admin-chat-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación con el asistente">
-                  <div class="chat-message assistant-message">
-                    <strong>Asistente</strong>
-                    <p>¡Hola! ¿Qué andas buscando? Puedo ayudarte con el panel, contarte qué hay en Inicio o revisar contigo los planes de Servicios. Pregúntame como te salga.</p>
-                  </div>
+              <div id="admin-chat-messages" class="admin-chat-messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación con el asistente">
+                <div class="chat-message assistant-message">
+                  <strong>Asistente</strong>
+                  <p>¡Hola! ¿Qué andas buscando? Puedo ayudarte con el panel, contarte qué hay en Inicio o revisar contigo los planes de Servicios. Pregúntame como te salga.</p>
                 </div>
-
-                <div class="assistant-suggestions" aria-label="Preguntas sugeridas">
-                  <button type="button" class="ai-option" data-chat-question="¿Cómo agrego un administrador?">Agregar administrador</button>
-                  <button type="button" class="ai-option" data-chat-question="¿Cómo gestiono las sesiones?">Gestionar sesiones</button>
-                  <button type="button" class="ai-option" data-chat-question="¿Qué puedo ver en Inicio?">Explorar Inicio</button>
-                  <button type="button" class="ai-option" data-chat-question="¿Qué servicios y planes ofrecen?">Ver servicios</button>
-                  <button type="button" class="ai-option" data-chat-question="¿Cuánto cuestan los planes?">Consultar precios</button>
-                </div>
-
-                <form id="admin-chat-form" class="admin-chat-form">
-                  <label for="admin-chat-input">¿Qué te gustaría saber?</label>
-                  <div class="admin-chat-input-row">
-                    <input type="text" id="admin-chat-input" name="question" maxlength="300" autocomplete="off" placeholder="Pregunta sobre Admin, Inicio o Servicios..." required />
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                  </div>
-                </form>
               </div>
 
-              <aside class="admin-future-slot" id="admin-future-feature-slot" aria-labelledby="admin-future-slot-title">
-                <p class="section-label">Espacio reservado</p>
-                <h4 id="admin-future-slot-title">Próxima función</h4>
-                <p>Aquí podremos incorporar la nueva herramienta administrativa que definamos después.</p>
-              </aside>
+              <div class="assistant-suggestions" aria-label="Preguntas sugeridas">
+                <button type="button" class="ai-option" data-chat-question="¿Cómo agrego un administrador?">Agregar administrador</button>
+                <button type="button" class="ai-option" data-chat-question="¿Cómo gestiono las sesiones?">Gestionar sesiones</button>
+                <button type="button" class="ai-option" data-chat-question="¿Qué puedo ver en Inicio?">Explorar Inicio</button>
+                <button type="button" class="ai-option" data-chat-question="¿Qué servicios y planes ofrecen?">Ver servicios</button>
+                <button type="button" class="ai-option" data-chat-question="¿Cuánto cuestan los planes?">Consultar precios</button>
+              </div>
+
+              <form id="admin-chat-form" class="admin-chat-form">
+                <label for="admin-chat-input">¿Qué te gustaría saber?</label>
+                <div class="admin-chat-input-row">
+                  <input type="text" id="admin-chat-input" name="question" maxlength="300" autocomplete="off" placeholder="Pregunta sobre Admin, Inicio o Servicios..." required />
+                  <button type="submit" class="btn btn-primary">Enviar</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel-section site-editor-section" aria-labelledby="site-editor-title">
+            <h3 id="site-editor-title">Preparar un cambio del sitio</h3>
+            <p class="site-editor-description">Elige un dato, edítalo y revisa la propuesta. Nada se guarda hasta confirmar.</p>
+            <form id="site-content-form" class="panel-form">
+              <div class="input-row">
+                <label id="site-content-select-label" for="site-content-field">Dato de Inicio o Servicios</label>
+                <div class="custom-select" id="site-content-custom-select">
+                  <button type="button" class="custom-select-trigger" id="site-content-select-trigger" aria-labelledby="site-content-select-label site-content-selected-label" aria-haspopup="listbox" aria-expanded="false" aria-controls="site-content-options">
+                    <span id="site-content-selected-label">Selecciona un dato</span>
+                    <span class="custom-select-arrow" aria-hidden="true"></span>
+                  </button>
+                  <div class="custom-select-options hidden" id="site-content-options" role="listbox" aria-labelledby="site-content-select-label"></div>
+                  <select id="site-content-field" class="visually-hidden-select" tabindex="-1" aria-hidden="true" required></select>
+                </div>
+              </div>
+              <div class="input-row">
+                <label for="site-content-value">Nuevo contenido</label>
+                <textarea id="site-content-value" rows="4" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-secondary">Preparar cambio</button>
+            </form>
+
+            <div id="admin-change-preview" class="admin-change-preview hidden" aria-live="polite">
+              <h4 id="admin-change-title">Cambio pendiente</h4>
+              <p id="admin-change-description"></p>
+              <p class="local-mode-warning">Modo demostración local: al confirmar, el cambio se guarda solo en este navegador; no se publica ni se sube a Internet. Las cuentas y contraseñas de este panel tampoco son adecuadas para producción.</p>
+              <div class="session-actions">
+                <button type="button" class="btn btn-primary" id="confirm-admin-change-btn">Confirmar y guardar</button>
+                <button type="button" class="btn btn-secondary" id="cancel-admin-change-btn">Cancelar</button>
+              </div>
             </div>
           </section>
 
@@ -186,6 +211,7 @@
     </div>
   </main>
 
+  <script src="../js/site-content.js"></script>
   <script src="../js/admin.js"></script>
 </body>
 </html>

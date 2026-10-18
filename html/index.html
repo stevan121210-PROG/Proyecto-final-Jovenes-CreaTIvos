@@ -33,16 +33,16 @@
     <section class="hero" id="inicio">
       <div class="container hero-inner">
         <!-- Texto principal que comunica la propuesta de valor -->
-        <h1>Desarrollo de páginas web empresariales</h1>
-        <p class="hero-text">
+        <h1 id="home-title">Desarrollo de páginas web empresariales</h1>
+        <p class="hero-text" id="home-description">
           Creamos sitios corporativos modernos, funcionales y adaptados a móviles,
           con identidad visual en negro, dorado y blanco para transmitir elegancia y confianza.
         </p>
 
         <!-- Botones de llamada a la acción -->
         <div class="hero-actions">
-          <a href="servicios.html" class="btn btn-primary btn-golden">Ver servicios</a>
-          <a href="admin.html" class="btn btn-secondary btn-golden">Panel admin</a>
+          <a href="servicios.html" class="btn btn-primary btn-golden" id="home-services-button">Ver servicios</a>
+          <a href="admin.html" class="btn btn-secondary btn-golden" id="home-admin-button">Panel admin</a>
         </div>
       </div>
     </section>
@@ -51,32 +51,18 @@
     <section class="proyectos" id="proyectos">
       <div class="container">
         <div class="section-header">
-          <p class="section-label">Proyectos realizados</p>
-          <h2>Casos de éxito recientes</h2>
-          <p class="section-description">
+          <p class="section-label" id="home-projects-label">Proyectos realizados</p>
+          <h2 id="home-projects-title">Casos de éxito recientes</h2>
+          <p class="section-description" id="home-projects-description">
             Ejemplos de páginas empresariales entregadas por ProgramStyle. Haz clic en cada proyecto para ver el sitio en vivo.
           </p>
         </div>
 
-        <div class="project-grid">
-          <a href="https://shinsushii.vercel.app/" target="_blank" rel="noreferrer" class="project-card">
-            <img src="../assets/img/Shinsushii_referencia.png" alt="Shinsushii proyecto web" />
-            <div class="project-info">
-              <h3>Shinsushii</h3>
-              <p>Landing web elegante para marca de sushi con enfoque visual y navegación fluida.</p>
-            </div>
-          </a>
-
-          <a href="https://smphcompresores.vercel.app/" target="_blank" rel="noreferrer" class="project-card">
-            <img src="../assets/img/SMPH_Industrial_referencia.png" alt="SMPH Compresores proyecto web" />
-            <div class="project-info">
-              <h3>SMPH Compresores</h3>
-              <p>Sitio corporativo industrial con enfoque en confianza, servicios y contacto rápido.</p>
-            </div>
-          </a>
-        </div>
+        <div class="project-grid" id="home-project-grid"></div>
       </div>
     </section>
   </main>
+  <script src="../js/site-content.js"></script>
+  <script src="../js/main.js"></script>
 </body>
 </html>
