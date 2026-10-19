@@ -1,3 +1,6 @@
+import { ProgramStyleContent } from "./site-content.js";
+import { invokeFunction, supabase, supabaseConfigError } from "./supabase-client.js";
+
 const loginForm = document.getElementById("admin-login-form");
 const loginError = document.getElementById("login-error");
 const loginSection = document.getElementById("login-section");
@@ -11,6 +14,9 @@ const sessionMessage = document.getElementById("session-message");
 const logoutCurrentBtn = document.getElementById("logout-current-btn");
 const backendStatus = document.getElementById("backend-status");
 const panelToggles = document.querySelectorAll(".panel-toggle");
+const contactRequestsList = document.getElementById("contact-requests-list");
+const contactRequestsMessage = document.getElementById("contact-requests-message");
+const contactRequestCount = document.getElementById("contact-request-count");
 const adminChatForm = document.getElementById("admin-chat-form");
 const adminChatInput = document.getElementById("admin-chat-input");
 const adminChatMessages = document.getElementById("admin-chat-messages");
@@ -28,7 +34,7 @@ const changeDescription = document.getElementById("admin-change-description");
 const confirmChangeBtn = document.getElementById("confirm-admin-change-btn");
 const cancelChangeBtn = document.getElementById("cancel-admin-change-btn");
 
-let siteContent = window.ProgramStyleContent.get();
+let siteContent = ProgramStyleContent.get();
 let pendingAdminChange = null;
 let currentAdmin = null;
 
@@ -68,7 +74,7 @@ const ADMIN_HELP_TOPICS = [
     priority: -2,
     keywords: ["panel admin", "panel de admin", "panel de administracion", "funciones administrativas", "que hace admin"],
     responses: [
-      "El panel Admin permite editar el contenido compartido de Inicio y Servicios, gestionar cuentas administrativas y cerrar tu sesión. Las tarjetas de Solicitudes y Clientes siguen siendo informativas."
+      "El panel Admin permite revisar solicitudes enviadas por el formulario, editar el contenido compartido de Inicio y Servicios, gestionar cuentas administrativas y cerrar tu sesión."
     ]
   },
   {
@@ -83,8 +89,7 @@ const ADMIN_HELP_TOPICS = [
     id: "admin-requests",
     keywords: ["solicitud", "solicitudes", "cotizacion", "cotizaciones", "formulario", "mensaje de contacto"],
     responses: [
-      "Para pedir una cotización, abre “Servicios” y completa el formulario de contacto. El panel Admin muestra una tarjeta de Solicitudes, pero todavía no recibe ni guarda esos envíos.",
-      "Las cotizaciones se solicitan desde el formulario de la página “Servicios”. Importante: aunque Admin muestra una tarjeta de Solicitudes, todavía no hay una bandeja conectada para revisarlas dentro del panel."
+      "Las cotizaciones se solicitan desde el formulario de la página “Servicios”. En Admin, abre “Ver solicitudes” para revisar los mensajes guardados y marcar como atendidos los que ya gestionaste."
     ]
   },
   {
@@ -440,26 +445,26 @@ async function confirmPendingAdminChange() {
 
   try {
     if (pendingAdminChange.type === "site-content") {
-      siteContent = await window.ProgramStyleContent.save(pendingAdminChange.content);
+      siteContent = await ProgramStyleContent.save(pendingAdminChange.content);
       renderContentFieldOptions();
       siteContentForm?.reset();
       updateContentFieldValue();
       addChatMessage("¡Listo! El cambio quedó guardado en el sitio y ya está disponible para todos. Recarga Inicio o Servicios para verlo.", "assistant");
     } else if (pendingAdminChange.type === "admin-create") {
-      await adminRequest("/api/admins", {
+      await adminRequest("admins", {
         method: "POST",
-        body: JSON.stringify(pendingAdminChange.user)
+        body: { action: "create", ...pendingAdminChange.user }
       });
       createAdminForm?.reset();
       await updateSessionList();
       setMessage(createAdminMessage, "Nueva cuenta administradora guardada.", "success");
       addChatMessage(`La cuenta “${pendingAdminChange.user.email}” se creó tras tu confirmación.`, "assistant");
     } else if (pendingAdminChange.type === "admin-profile") {
-      const profile = await adminRequest("/api/admins", {
-        method: "PATCH",
-        body: JSON.stringify(pendingAdminChange.profile)
+      const { admin } = await adminRequest("admins", {
+        method: "POST",
+        body: { action: "update-profile", ...pendingAdminChange.profile }
       });
-      currentAdmin = profile.admin;
+      currentAdmin = admin;
       editAdminForm?.reset();
       await updateSessionList();
       setMessage(editAdminMessage, "Credenciales actualizadas.", "success");
@@ -637,27 +642,15 @@ function getDynamicAdminHelpResponse(topic) {
   return null;
 }
 
-async function adminRequest(url, options = {}) {
-  const response = await fetch(url, {
-    ...options,
-    credentials: "same-origin",
-    headers: {
-      Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers
-    }
-  });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
-  }
-  return result;
+async function adminRequest(functionName, options = {}) {
+  if (!supabase) throw supabaseConfigError;
+  return invokeFunction(functionName, options);
 }
 
 async function updateSessionList() {
   if (!sessionList) return;
   try {
-    const { admins } = await adminRequest("/api/admins");
+    const { admins } = await adminRequest("admins", { method: "GET" });
     if (!admins.length) {
       const emptyMessage = document.createElement("p");
       emptyMessage.className = "panel-message";
@@ -686,7 +679,7 @@ async function updateSessionList() {
         removeButton.addEventListener("click", async () => {
           if (!window.confirm(`¿Eliminar la cuenta administradora ${admin.email}?`)) return;
           try {
-            await adminRequest(`/api/admins?id=${encodeURIComponent(admin.id)}`, { method: "DELETE" });
+            await adminRequest("admins", { method: "POST", body: { action: "delete", id: admin.id } });
             setMessage(sessionMessage, `Se eliminó ${admin.email}.`, "success");
             await updateSessionList();
           } catch (error) {
@@ -703,6 +696,75 @@ async function updateSessionList() {
   }
 }
 
+async function updateContactRequests() {
+  if (!contactRequestsList) return;
+  contactRequestsList.replaceChildren();
+  setMessage(contactRequestsMessage, "Cargando solicitudes...", "");
+  try {
+    const { requests } = await adminRequest("contact-requests", { method: "GET" });
+    if (!Array.isArray(requests)) throw new Error("El servidor devolvió una lista de solicitudes no válida.");
+    if (contactRequestCount) contactRequestCount.textContent = String(requests.filter(({ status }) => status === "new").length);
+    if (!requests.length) {
+      const emptyMessage = document.createElement("p");
+      emptyMessage.className = "panel-message";
+      emptyMessage.textContent = "Todavía no hay solicitudes de contacto.";
+      contactRequestsList.replaceChildren(emptyMessage);
+      setMessage(contactRequestsMessage, "", "");
+      return;
+    }
+
+    const requestCards = requests.map((request) => {
+      const item = document.createElement("article");
+      item.className = "contact-request-card";
+      const heading = document.createElement("div");
+      heading.className = "contact-request-heading";
+      const name = document.createElement("strong");
+      name.textContent = request.name;
+      const status = document.createElement("span");
+      status.className = `badge ${request.status === "new" ? "active" : ""}`;
+      status.textContent = request.status === "new" ? "Nueva" : "Atendida";
+      heading.append(name, status);
+
+      const details = document.createElement("p");
+      details.textContent = [
+        request.email,
+        request.phone,
+        request.service ? `Servicio: ${request.service}` : null,
+        request.created_at ? new Date(request.created_at).toLocaleString() : null
+      ].filter(Boolean).join(" · ");
+      const message = document.createElement("p");
+      message.className = "contact-request-message";
+      message.textContent = request.message;
+      item.append(heading, details, message);
+
+      if (request.status === "new") {
+        const markButton = document.createElement("button");
+        markButton.type = "button";
+        markButton.className = "btn btn-secondary";
+        markButton.textContent = "Marcar atendida";
+        markButton.addEventListener("click", async () => {
+          markButton.disabled = true;
+          try {
+            await adminRequest("contact-requests", { body: { id: request.id, status: "contacted" } });
+            setMessage(contactRequestsMessage, "Solicitud marcada como atendida.", "success");
+            await updateContactRequests();
+          } catch (error) {
+            markButton.disabled = false;
+            setMessage(contactRequestsMessage, error.message, "error");
+          }
+        });
+        item.append(markButton);
+      }
+      return item;
+    });
+    contactRequestsList.replaceChildren(...requestCards);
+    setMessage(contactRequestsMessage, "", "");
+  } catch (error) {
+    contactRequestsList.replaceChildren();
+    setMessage(contactRequestsMessage, `No se pudieron cargar las solicitudes: ${error.message}`, "error");
+  }
+}
+
 function showAdminDashboard(admin) {
   currentAdmin = admin;
   if (loginSection) loginSection.classList.add("hidden");
@@ -711,6 +773,7 @@ function showAdminDashboard(admin) {
     adminDashboard.classList.add("visible");
   }
   updateSessionList();
+  updateContactRequests();
 }
 
 function showLogin() {
@@ -730,10 +793,10 @@ function setBackendStatus(message, type = "") {
 }
 
 async function initializeAdmin() {
-  siteContent = await window.ProgramStyleContent.load();
+  siteContent = await ProgramStyleContent.load();
   renderContentFieldOptions();
   updateContentFieldValue();
-  const contentError = window.ProgramStyleContent.getLoadError();
+  const contentError = ProgramStyleContent.getLoadError();
   if (contentError) {
     showLogin();
     setBackendStatus(`No se pudo cargar el contenido compartido: ${contentError.message}`, "error");
@@ -741,16 +804,22 @@ async function initializeAdmin() {
   }
 
   try {
-    const result = await adminRequest("/api/auth/session");
-    showAdminDashboard(result.admin);
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (!session) {
+      showLogin();
+      setBackendStatus("Backend conectado. Inicia sesión con una cuenta autorizada.");
+      return;
+    }
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    await adminRequest("admins", { method: "GET" });
+    showAdminDashboard({ id: user.id, email: user.email });
     setBackendStatus("Conectado: los cambios se guardan de forma compartida.", "success");
   } catch (error) {
+    await supabase.auth.signOut();
     showLogin();
-    if (!error.message.includes("No hay una sesión activa") && !error.message.includes("La sesión expiró")) {
-      setBackendStatus(error.message, "error");
-    } else {
-      setBackendStatus("Backend conectado. Inicia sesión con una cuenta autorizada.");
-    }
+    setBackendStatus(error.message, "error");
   }
 }
 
@@ -870,14 +939,40 @@ function addChatMessage(text, sender) {
   message.append(label, content);
   adminChatMessages.append(message);
   adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
+  return message;
 }
 
-function sendAdminChatMessage(question) {
+async function sendAdminChatMessage(question) {
   const trimmedQuestion = question.trim();
-  if (!trimmedQuestion || !adminChatMessages) return;
+  if (!trimmedQuestion || !adminChatMessages || adminChatInput?.disabled) return;
 
   addChatMessage(trimmedQuestion, "user");
-  addChatMessage(getAdminHelpResponse(trimmedQuestion), "assistant");
+  if (getRequestedContentChange(trimmedQuestion)) {
+    addChatMessage(getAdminHelpResponse(trimmedQuestion), "assistant");
+    return;
+  }
+
+  if (!supabase) {
+    addChatMessage(supabaseConfigError?.message || "No se pudo conectar el asistente con el servidor de IA.", "assistant");
+    return;
+  }
+
+  adminChatInput.disabled = true;
+  const sendButton = adminChatForm.querySelector("button[type='submit']");
+  if (sendButton) sendButton.disabled = true;
+  const loading = addChatMessage("Estoy revisando la información de ProgramStyle...", "assistant");
+  try {
+    const data = await invokeFunction("ai-chat", {
+      body: { message: trimmedQuestion, audience: "admin" }
+    });
+    loading.querySelector("p").textContent = data.reply;
+  } catch (error) {
+    loading.querySelector("p").textContent = `No se pudo consultar la IA: ${error.message}. Inténtalo de nuevo más tarde.`;
+    loading.classList.add("error");
+  } finally {
+    adminChatInput.disabled = false;
+    if (sendButton) sendButton.disabled = false;
+  }
 }
 
 if (loginForm) {
@@ -891,21 +986,28 @@ if (loginForm) {
       setMessage(loginError, "Completa el correo y la contraseña para continuar.", "error");
       return;
     }
-    if (window.ProgramStyleContent.getLoadError()) {
+    if (!supabase || supabaseConfigError) {
+      setMessage(loginError, supabaseConfigError?.message || "Supabase no está configurado.", "error");
+      return;
+    }
+    if (ProgramStyleContent.getLoadError()) {
       setMessage(loginError, "No se pudo cargar el contenido del sitio. Actualiza la página y comprueba la conexión antes de iniciar sesión.", "error");
       return;
     }
 
-    adminRequest("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password })
-    }).then(({ admin }) => {
-      showAdminDashboard(admin);
+    loginForm.querySelector("button[type='submit']").disabled = true;
+    supabase.auth.signInWithPassword({ email, password }).then(async ({ data, error }) => {
+      if (error) throw error;
+      await adminRequest("admins", { method: "GET" });
+      showAdminDashboard({ id: data.user.id, email: data.user.email });
       setBackendStatus("Conectado: los cambios se guardan de forma compartida.", "success");
       setMessage(loginError, "Acceso correcto.", "success");
       loginForm.reset();
-    }).catch((error) => {
+    }).catch(async (error) => {
+      if (supabase.auth.getSession) await supabase.auth.signOut();
       setMessage(loginError, error.message, "error");
+    }).finally(() => {
+      loginForm.querySelector("button[type='submit']").disabled = false;
     });
   });
 }
@@ -1069,7 +1171,7 @@ if (adminChatForm && adminChatInput) {
     const question = adminChatInput.value.trim();
     if (!question) return;
 
-    sendAdminChatMessage(question);
+    void sendAdminChatMessage(question);
     adminChatForm.reset();
     adminChatInput.focus();
   });
@@ -1081,7 +1183,7 @@ if (chatQuestionButtons.length) {
       const question = button.dataset.chatQuestion;
       if (!question) return;
 
-      sendAdminChatMessage(question);
+      void sendAdminChatMessage(question);
       adminChatInput?.focus();
     });
   });
@@ -1090,7 +1192,8 @@ if (chatQuestionButtons.length) {
 if (logoutCurrentBtn) {
   logoutCurrentBtn.addEventListener("click", async () => {
     try {
-      await adminRequest("/api/auth/logout", { method: "POST" });
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       showLogin();
       setMessage(sessionMessage, "Sesión cerrada.", "success");
     } catch (error) {

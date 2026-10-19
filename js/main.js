@@ -1,4 +1,8 @@
-window.ProgramStyleContent.load().then((content) => {
+import { ProgramStyleContent } from "./site-content.js";
+
+const SITE_BASE_PATH = import.meta.env.BASE_URL;
+
+ProgramStyleContent.load().then((content) => {
   const homeContent = content.home;
 
   document.getElementById("home-title").textContent = homeContent.title;
@@ -12,13 +16,17 @@ window.ProgramStyleContent.load().then((content) => {
   const projectGrid = document.getElementById("home-project-grid");
   homeContent.projects.forEach((project) => {
     const card = document.createElement("a");
-    card.href = project.url;
+    card.href = /^https?:\/\//i.test(project.url)
+      ? project.url
+      : `${SITE_BASE_PATH}${project.url.replace(/^(?:\.\.\/|\/)+/, "")}`;
     card.target = "_blank";
     card.rel = "noreferrer";
     card.className = "project-card";
 
     const image = document.createElement("img");
-    image.src = project.image;
+    image.src = /^https?:\/\//i.test(project.image)
+      ? project.image
+      : `${SITE_BASE_PATH}${project.image.replace(/^(?:\.\.\/|\/)+/, "")}`;
     image.alt = project.alt;
 
     const info = document.createElement("div");
@@ -34,4 +42,19 @@ window.ProgramStyleContent.load().then((content) => {
     card.append(image, info);
     projectGrid.appendChild(card);
   });
+  const contentStatus = document.getElementById("site-content-status");
+  const loadError = ProgramStyleContent.getLoadError();
+  if (loadError && contentStatus) {
+    contentStatus.textContent = `No se pudo conectar con el contenido actualizado. Se muestran los datos predeterminados. ${loadError.message}`;
+    contentStatus.classList.remove("hidden");
+    contentStatus.classList.add("error");
+  }
+}).catch((error) => {
+  console.error("No se pudo mostrar el contenido de Inicio:", error);
+  const contentStatus = document.getElementById("site-content-status");
+  if (contentStatus) {
+    contentStatus.textContent = `No se pudo cargar Inicio: ${error.message}`;
+    contentStatus.classList.remove("hidden");
+    contentStatus.classList.add("error");
+  }
 });

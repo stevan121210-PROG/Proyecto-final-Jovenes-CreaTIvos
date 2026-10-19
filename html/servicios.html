@@ -34,6 +34,8 @@
       </div>
     </section>
 
+    <p id="site-content-status" class="site-status hidden" role="status" aria-live="polite"></p>
+
     <section class="container catalogo" id="catalogo-container"></section>
 
     <section class="container ai-asistencia">
@@ -47,6 +49,23 @@
       <div class="ai-panel" id="ia-panel" aria-live="polite">
         <p class="ai-panel-title">Selecciona una consulta rápida:</p>
         <div class="ai-options" id="services-ai-options"></div>
+      </div>
+      <div class="public-ai-chat" id="public-ai-chat">
+        <h3>Pregunta a nuestro asistente</h3>
+        <div id="public-ai-messages" class="admin-chat-messages" role="log" aria-live="polite" aria-label="Chat de asesoría web">
+          <div class="chat-message assistant-message">
+            <strong>ProgramStyle</strong>
+            <p>Cuéntame qué necesita tu negocio y te orientaré sobre nuestros servicios.</p>
+          </div>
+        </div>
+        <form id="public-ai-form" class="admin-chat-form">
+          <label for="public-ai-input">Tu consulta</label>
+          <div class="admin-chat-input-row">
+            <input type="text" id="public-ai-input" name="question" maxlength="1000" autocomplete="off" placeholder="Ej.: ¿Qué plan me conviene para vender en línea?" required />
+            <button type="submit" class="btn btn-primary">Consultar</button>
+          </div>
+          <p id="public-ai-status" class="panel-message" role="status" aria-live="polite"></p>
+        </form>
       </div>
     </section>
 
@@ -99,7 +118,6 @@
     </section>
   </main>
 
-  <script src="../js/site-content.js"></script>
-  <script src="../js/servicios.js"></script>
+  <script type="module" src="../js/servicios.js"></script>
 </body>
 </html>

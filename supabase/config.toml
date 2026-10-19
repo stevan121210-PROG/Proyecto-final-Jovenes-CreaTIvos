@@ -1,0 +1,11 @@
+[functions.ai-chat]
+verify_jwt = false
+
+[functions.admins]
+verify_jwt = false
+
+[functions.contact-request]
+verify_jwt = false
+
+[functions.contact-requests]
+verify_jwt = false

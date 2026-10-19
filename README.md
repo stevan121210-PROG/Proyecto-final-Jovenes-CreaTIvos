@@ -1,25 +1,29 @@
 # ProgramStyle
 
-Sitio estático con un servidor local de Node.js y funciones de backend compatibles con Vercel. Supabase proporciona autenticación administrativa y almacenamiento compartido del contenido.
+Sitio estático de ProgramStyle, publicado en GitHub Pages con Vite. Supabase proporciona autenticación, contenido compartido, recepción privada de solicitudes y Edge Functions. OpenAI alimenta los asistentes de Servicios y Admin.
 
 ## Desarrollo local
 
-Necesitas Node.js 20.18 o posterior. Crea `.env.local` a partir de `.env.example`, completa las credenciales del proyecto Supabase y ejecuta:
+Requisitos: Node.js 20.19 o posterior.
 
-```powershell
-Copy-Item .env.example .env.local
-npm.cmd install
-npm.cmd start
-```
+1. Copia `.env.example` como `.env.local`.
+2. Completa `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` con los valores públicos del proyecto Supabase. No pongas claves privadas en variables `VITE_*`.
+3. Instala y ejecuta:
 
-Abre `http://localhost:3000`. El servidor local entrega tanto las páginas como las mismas rutas `/api` que se despliegan como funciones en Vercel. Sin credenciales Supabase, las páginas públicas muestran el contenido predeterminado, pero el inicio de sesión y los cambios compartidos no estarán disponibles.
+   ```powershell
+   npm.cmd ci
+   npm.cmd start
+   ```
+
+4. Abre `http://127.0.0.1:5173`. Para compilar la web estática localmente, ejecuta `npm.cmd run build`; los archivos resultantes quedan en `dist`.
+
+Sin credenciales, Vite puede compilar y mostrar el contenido predeterminado, pero la autenticación, el guardado compartido, los chats y el formulario que registra solicitudes no funcionarán.
 
 ## Configurar Supabase
 
-1. Crea un proyecto Supabase y abre **SQL Editor**.
-2. Ejecuta el contenido de [`supabase/schema.sql`](./supabase/schema.sql). Las tablas no conceden acceso directo a visitantes; el servidor accede a ellas con su clave privada.
-3. En **Authentication → Users**, crea el primer usuario administrador con correo y contraseña confirmados. Desactiva el registro público de usuarios en Authentication.
-4. Autoriza esa cuenta ejecutando en SQL Editor, sustituyendo el correo de ejemplo:
+1. Crea un proyecto Supabase y ejecuta [`supabase/schema.sql`](./supabase/schema.sql) desde **SQL Editor**.
+2. En **Authentication → Users**, crea el primer usuario con correo y contraseña. Desactiva el registro público de usuarios.
+3. Autoriza el usuario inicial desde SQL Editor, sustituyendo el correo:
 
    ```sql
    insert into public.admin_users (id, email)
@@ -29,19 +33,46 @@ Abre `http://localhost:3000`. El servidor local entrega tanto las páginas como 
    on conflict (id) do nothing;
    ```
 
-5. En la configuración API de Supabase, copia la URL del proyecto, la clave publicable/anon y la clave `service_role`/secreta. Ponlas en `.env.local` para desarrollo y en las variables de entorno del proyecto Vercel:
+4. Instala la CLI de Supabase, autentícate y vincula el proyecto:
 
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+   ```powershell
+   npx supabase login
+   npx supabase link --project-ref TU_PROJECT_REF
+   ```
 
-   La clave `SUPABASE_SERVICE_ROLE_KEY` es privada: no la pongas en archivos HTML/JavaScript del navegador, no la publiques y no la compartas por chat. `.env.local` está excluido de Git.
+5. Configura secretos de las Edge Functions. `ALLOWED_ORIGINS` debe contener los orígenes separados por coma, sin rutas. Incluye el dominio `https://TU_USUARIO.github.io` y los orígenes locales `http://127.0.0.1:5173,http://localhost:5173`.
 
-## Desplegar en Vercel
+   ```powershell
+   npx supabase secrets set OPENAI_API_KEY=TU_CLAVE_OPENAI ALLOWED_ORIGINS="https://TU_USUARIO.github.io,http://127.0.0.1:5173,http://localhost:5173"
+   ```
 
-1. Importa este repositorio en Vercel, usando la carpeta raíz del proyecto. No configures una carpeta de salida distinta: `vercel.json` asigna la portada y las rutas de Inicio, Servicios y Admin.
-2. Añade las tres variables de Supabase anteriores en **Project Settings → Environment Variables** para los entornos que vayas a usar.
-3. Despliega el proyecto. Vercel servirá HTML, CSS, JavaScript e imágenes como archivos estáticos y ejecutará los módulos de `api/` como funciones Node.js.
-4. Abre el dominio asignado e inicia sesión con el correo de la cuenta autorizada. Cuando confirmes una edición, se almacena en Supabase y se comparte con todos los visitantes.
+   Supabase proporciona `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` a las funciones. Nunca publiques la clave de OpenAI ni la clave service role en el frontend o en GitHub Pages.
 
-El servidor local escucha solo en `127.0.0.1`; Vercel no puede conectarse al equipo local. En producción, Vercel ejecuta sus propias funciones `/api`, que comparten el código de backend con el servidor local. Las claves de entorno y la inicialización del proyecto Supabase son necesarias antes de habilitar el panel administrativo.
+6. Despliega cada función desde la raíz del repositorio:
+
+   ```powershell
+   npx supabase functions deploy ai-chat
+   npx supabase functions deploy admins
+   npx supabase functions deploy contact-request
+   npx supabase functions deploy contact-requests
+   ```
+
+   [`supabase/config.toml`](./supabase/config.toml) desactiva la verificación JWT automática del gateway; cada función valida explícitamente los tokens y permisos de Admin cuando corresponde. Las consultas públicas siguen limitadas por origen y tasa.
+
+## Publicar en GitHub Pages
+
+1. Sube el repositorio a GitHub en la rama `main`.
+2. En **Settings → Secrets and variables → Actions → Variables**, crea:
+   - `SUPABASE_URL`: URL del proyecto Supabase.
+   - `SUPABASE_ANON_KEY`: clave publicable/anon del proyecto. Es pública y se usa para conectar el navegador.
+3. En **Settings → Pages**, selecciona **GitHub Actions** como origen.
+4. Cada push a `main` construye el sitio con Vite y lo despliega. También puedes iniciarlo desde **Actions → Deploy ProgramStyle to GitHub Pages → Run workflow**.
+
+El workflow configura la ruta base tanto para un repositorio de proyecto (`https://TU_USUARIO.github.io/NOMBRE_REPO/`) como para el repositorio principal de usuario (`https://TU_USUARIO.github.io/`).
+
+## Funcionalidad y límites
+
+- El formulario de Servicios registra solicitudes en `contact_requests`; las cuentas autorizadas las revisan en Admin y pueden marcarlas como atendidas.
+- El contenido compartido se lee desde `site_content`. Hasta que se confirme el primer cambio, la web y la IA usan el contenido predeterminado incorporado.
+- Los cambios de contenido y de cuentas administrativas requieren confirmación en el panel. La IA explica y prepara, pero no ejecuta ni publica acciones por sí sola.
+- Para comprobar `package.json` y los módulos del navegador: `npm.cmd run build`. La integración real requiere configurar GitHub Pages, Supabase y una clave válida de OpenAI.

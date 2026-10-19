@@ -1,3 +1,5 @@
+import { supabase, supabaseConfigError } from "./supabase-client.js";
+
 (() => {
   const DEFAULT_CONTENT = {
     home: {
@@ -121,7 +123,7 @@
     }
   };
 
-  let currentContent = null;
+  let currentContent = clone(DEFAULT_CONTENT);
   let loadError = null;
 
   function clone(value) {
@@ -173,12 +175,14 @@
 
   async function load() {
     try {
-      const response = await fetch("/api/content", { headers: { Accept: "application/json" } });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
-      }
-      if (result.content) currentContent = migrate(result.content);
+      if (supabaseConfigError || !supabase) throw supabaseConfigError;
+      const { data, error } = await supabase
+        .from("site_content")
+        .select("content")
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) throw error;
+      if (data?.content) currentContent = migrate(data.content);
       loadError = null;
     } catch (error) {
       loadError = error;
@@ -188,16 +192,13 @@
   }
 
   async function save(content) {
-    const response = await fetch("/api/content", {
-      method: "PUT",
-      credentials: "same-origin",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ content })
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(result.error || `El servidor respondió con HTTP ${response.status}.`);
-    }
+    if (supabaseConfigError || !supabase) throw supabaseConfigError;
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("Inicia sesión como administrador para guardar los cambios.");
+    const { error } = await supabase
+      .from("site_content")
+      .upsert({ id: 1, content, updated_by: user.id }, { onConflict: "id" });
+    if (error) throw error;
     currentContent = migrate(content);
     loadError = null;
     return get();
@@ -209,3 +210,5 @@
 
   window.ProgramStyleContent = { get, load, save, defaults, getLoadError: () => loadError };
 })();
+
+export const ProgramStyleContent = window.ProgramStyleContent;

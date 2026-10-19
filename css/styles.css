@@ -302,6 +302,60 @@ textarea {
   line-height: 1.8;
 }
 
+.site-status {
+  width: min(1120px, 100% - 2rem);
+  margin: 0 auto 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(226, 199, 133, 0.5);
+  border-radius: 12px;
+  background: rgba(196, 154, 79, 0.1);
+  color: var(--color-accent-light);
+}
+
+.site-status.error,
+.form-feedback.error,
+.panel-message.error,
+.chat-message.error p {
+  color: #ffb1b1;
+  border-color: rgba(255, 100, 100, 0.5);
+}
+
+.public-ai-chat {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(196, 154, 79, 0.25);
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.public-ai-chat h3 {
+  margin-bottom: 1rem;
+  color: var(--color-accent-light);
+}
+
+.public-ai-chat .admin-chat-messages {
+  max-height: 320px;
+  margin-bottom: 1rem;
+}
+
+.admin-chat-messages .chat-message.error {
+  border-color: rgba(255, 100, 100, 0.4);
+}
+
+.public-ai-chat .admin-chat-input-row input {
+  min-width: 0;
+}
+
+.public-ai-chat .admin-chat-form {
+  margin-top: 0.5rem;
+}
+
+.btn:disabled,
+input:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .catalogo {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -551,6 +605,42 @@ textarea {
 
 .admin-quick-grid {
   margin-bottom: 1.5rem;
+}
+
+.admin-quick-grid .btn {
+  margin-top: 0.8rem;
+}
+
+.contact-requests-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.contact-request-card {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.contact-request-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contact-request-card p {
+  margin: 0;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.contact-request-card .contact-request-message {
+  color: var(--color-text);
+  white-space: pre-wrap;
 }
 
 .admin-sections {

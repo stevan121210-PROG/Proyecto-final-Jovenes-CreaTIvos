@@ -1,4 +1,7 @@
-window.ProgramStyleContent.load().then((siteContent) => {
+import { ProgramStyleContent } from "./site-content.js";
+import { invokeFunction, supabase, supabaseConfigError } from "./supabase-client.js";
+
+ProgramStyleContent.load().then((siteContent) => {
   const serviceContent = siteContent.services;
   const paquetes = serviceContent.packages.map((paquete) => ({
     nombre: paquete.name,
@@ -124,6 +127,71 @@ window.ProgramStyleContent.load().then((siteContent) => {
       catalogoContainer.appendChild(tarjeta);
     });
 
+    const publicAiForm = document.getElementById("public-ai-form");
+    const publicAiInput = document.getElementById("public-ai-input");
+    const publicAiMessages = document.getElementById("public-ai-messages");
+    const publicAiStatus = document.getElementById("public-ai-status");
+    publicAiForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const question = publicAiInput.value.trim();
+      if (!question) return;
+      if (!supabase) {
+        publicAiStatus.textContent = supabaseConfigError?.message || "No se pudo conectar la IA.";
+        publicAiStatus.classList.add("error");
+        return;
+      }
+
+      const message = document.createElement("div");
+      message.className = "chat-message user-message";
+      const userLabel = document.createElement("strong");
+      userLabel.textContent = "Tú";
+      const userQuestion = document.createElement("p");
+      userQuestion.textContent = question;
+      message.append(userLabel, userQuestion);
+      publicAiMessages.append(message);
+
+      const replyMessage = document.createElement("div");
+      replyMessage.className = "chat-message assistant-message";
+      const assistantLabel = document.createElement("strong");
+      assistantLabel.textContent = "ProgramStyle";
+      const reply = document.createElement("p");
+      reply.textContent = "Estoy revisando nuestros servicios...";
+      replyMessage.append(assistantLabel, reply);
+      publicAiMessages.append(replyMessage);
+      publicAiMessages.scrollTop = publicAiMessages.scrollHeight;
+      publicAiInput.value = "";
+      publicAiInput.disabled = true;
+      const submitButton = publicAiForm.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      publicAiStatus.textContent = "";
+      publicAiStatus.classList.remove("error");
+
+      try {
+        const data = await invokeFunction("ai-chat", {
+          body: { message: question, audience: "public" }
+        });
+        reply.textContent = data.reply;
+      } catch (error) {
+        replyMessage.classList.add("error");
+        reply.textContent = "No pudimos responder ahora. Inténtalo de nuevo más tarde.";
+        publicAiStatus.textContent = `No se pudo conectar con la IA: ${error.message}`;
+        publicAiStatus.classList.add("error");
+      } finally {
+        publicAiInput.disabled = false;
+        submitButton.disabled = false;
+        publicAiInput.focus();
+        publicAiMessages.scrollTop = publicAiMessages.scrollHeight;
+      }
+    });
+
+    const contentLoadError = ProgramStyleContent.getLoadError();
+    const contentStatus = document.getElementById("site-content-status");
+    if (contentLoadError && contentStatus) {
+      contentStatus.textContent = `No se pudo conectar con el contenido actualizado. Se muestran los datos predeterminados. ${contentLoadError.message}`;
+      contentStatus.classList.remove("hidden");
+      contentStatus.classList.add("error");
+    }
+
     const form = document.getElementById("contact-form");
     const feedback = document.getElementById("form-feedback");
     const iaButton = document.getElementById("consultar-ia-btn");
@@ -164,7 +232,7 @@ window.ProgramStyleContent.load().then((siteContent) => {
     }
 
     if (form) {
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         const nombre = document.getElementById("nombre").value.trim();
@@ -195,16 +263,27 @@ window.ProgramStyleContent.load().then((siteContent) => {
           return;
         }
 
-        const whatsappLink = crearMensajeWhatsApp({ nombre, email, telefono, servicio, mensaje });
-        const correoLink = crearMensajeCorreo({ nombre, email, telefono, servicio, mensaje });
+        if (!supabase) {
+          mensajeError(supabaseConfigError?.message || "No se pudo conectar con el servidor de solicitudes.");
+          return;
+        }
 
-        mensajeExito(serviceContent.requestSentMessage);
-        form.reset();
+        const submitButton = form.querySelector("button[type='submit']");
+        submitButton.disabled = true;
+        feedback.textContent = "Enviando tu solicitud...";
+        feedback.classList.remove("error", "success");
 
-        window.open(whatsappLink, "_blank", "noopener,noreferrer");
-        window.location.href = correoLink;
-
-        console.log({ nombre, email, telefono, servicio, mensaje, whatsappLink, correoLink });
+        try {
+          await invokeFunction("contact-request", {
+            body: { name: nombre, email, phone: telefono, service: servicio, message }
+          });
+          mensajeExito(serviceContent.requestSentMessage);
+          form.reset();
+        } catch (error) {
+          mensajeError(`No se pudo enviar tu solicitud: ${error.message}. Inténtalo de nuevo o contáctanos por WhatsApp.`);
+        } finally {
+          submitButton.disabled = false;
+        }
       });
     }
   }
@@ -218,4 +297,12 @@ window.ProgramStyleContent.load().then((siteContent) => {
   } else {
     renderServices();
   }
-}).catch((error) => console.error("No se pudieron iniciar los servicios:", error));
+}).catch((error) => {
+  console.error("No se pudieron iniciar los servicios:", error);
+  const contentStatus = document.getElementById("site-content-status");
+  if (contentStatus) {
+    contentStatus.textContent = `No se pudieron cargar los servicios: ${error.message}`;
+    contentStatus.classList.remove("hidden");
+    contentStatus.classList.add("error");
+  }
+});

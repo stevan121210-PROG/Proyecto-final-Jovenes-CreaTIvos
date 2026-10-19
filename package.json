@@ -1,15 +1,21 @@
 {
-  "name": "programstyle-local",
+  "name": "programstyle-site",
   "version": "1.0.0",
   "private": true,
-  "description": "Servidor local para las páginas de ProgramStyle",
+  "description": "Sitio ProgramStyle para GitHub Pages con backend Supabase",
   "engines": {
-    "node": ">=20.18"
+    "node": ">=20.19"
   },
   "scripts": {
-    "start": "node --env-file-if-exists=.env.local server.js"
+    "start": "vite --host 127.0.0.1",
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.4"
   }
 }
