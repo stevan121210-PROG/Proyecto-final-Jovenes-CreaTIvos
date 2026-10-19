@@ -178,8 +178,7 @@ const ADMIN_HELP_TOPICS = [
     id: "service-ai",
     keywords: ["asistencia con ia", "consultar con ia", "inteligencia artificial", "consulta rapida", "recomendacion de servicio", "ia"],
     responses: [
-      "En “Servicios” hay un botón “Consultar con IA” con opciones para Landing Page, sitio corporativo y e-commerce. Al elegir una, prepara una consulta y la abre por WhatsApp; no es un chatbot que converse dentro del sitio.",
-      "La asistencia de Servicios funciona con opciones rápidas: eliges el tipo de proyecto y se abre WhatsApp con un mensaje preparado. No analiza preguntas libres dentro de la página por ahora."
+      "En “Servicios” puedes conversar con el asistente de IA sobre los planes y tu proyecto. También hay consultas rápidas que preparan un mensaje para WhatsApp."
     ]
   },
   {
@@ -187,30 +186,28 @@ const ADMIN_HELP_TOPICS = [
     keywords: ["contacto", "contactar", "whatsapp", "correo", "email", "formulario"],
     responses: [
       "Puedes contactar a ProgramStyle desde “Servicios”: usa el formulario o escribe por WhatsApp al +57 302 747 3875 o al correo Stevan121210@gmail.com. Cuéntales qué tipo de sitio necesitas y qué quieres incluir.",
-      "Para pedir una cotización, ve a “Servicios” y completa nombre, correo y mensaje; el teléfono es opcional. Al enviar, se prepara el contacto por WhatsApp y correo. También tienes los enlaces directos en la misma página."
+      "Para pedir una cotización, completa el formulario de Servicios con tu nombre, correo y mensaje; el teléfono y servicio son opcionales. Al enviar, la solicitud se registra para que el administrador pueda revisarla. También puedes escribir directamente por WhatsApp o correo."
     ]
   },
   {
     id: "admin-limits",
     keywords: ["editar servicios", "editar precios", "cambiar catalogo", "gestionar clientes", "administrar solicitudes", "bandeja de entrada", "modificar pagina", "editar inicio"],
     responses: [
-      "Ahora puedes preparar cambios para el contenido de Inicio y Servicios, incluidos planes y precios, desde “Preparar un cambio del sitio”. Se muestra una vista previa y tienes que confirmar; los cambios se guardan en el backend compartido. Las tarjetas de Solicitudes y Clientes siguen siendo informativas."
+      "Puedes preparar y confirmar cambios del contenido de Inicio y Servicios en “Preparar un cambio del sitio”. Las solicitudes del formulario se revisan en Admin; la gestión de clientes como CRM todavía no está disponible."
     ]
   },
   {
     id: "admin-clients",
     keywords: ["cliente", "clientes", "conversacion", "seguimiento"],
     responses: [
-      "La tarjeta “Clientes” del panel es una referencia a esa futura gestión, pero todavía no guarda clientes ni conversaciones. El contacto de los visitantes se inicia desde la página Servicios.",
-      "Hoy no hay un CRM dentro del panel: la sección de Clientes es informativa. Las consultas de clientes pueden llegar por el formulario y los enlaces de contacto publicados en Servicios."
+      "Admin permite consultar las solicitudes que envían los visitantes desde Servicios y marcarlas como atendidas. Aún no incluye un CRM con historial de clientes o conversaciones."
     ]
   },
   {
     id: "assistant",
     keywords: ["eres ia", "eres una ia", "eres un chatbot", "como funciona el asistente", "asistente administrativo"],
     responses: [
-      "Soy una guía local del sitio, no una IA conectada a un servicio externo. Aun así, puedo orientarte sobre las funciones actuales y el contenido de Admin, Inicio y Servicios; si algo no está implementado, te lo diré de frente.",
-      "Funciono con información preparada sobre este sitio, no genero respuestas usando un servicio de IA. Puedo conversar de forma más flexible sobre Admin, Inicio y Servicios, aunque no tengo acceso a datos nuevos ni a funciones que todavía no existen."
+      "Soy el asistente de ProgramStyle. Uso IA para responder preguntas sobre el sitio; en Admin también puedo guiarte sobre cambios, pero cualquier modificación requiere tu confirmación antes de guardarse."
     ]
   }
 ];
@@ -220,8 +217,8 @@ const ADMIN_HELP_FOLLOW_UPS = {
   "admin-credentials": "Abre “Editar credenciales”, ingresa un correo nuevo, una contraseña nueva o ambos, y confirma la propuesta para aplicar el cambio.",
   "admin-login": "La página de acceso está enlazada como “Admin” en la navegación. Si ya estás dentro, evita cerrar la sesión antes de actualizar las credenciales.",
   "admin-sessions": "La lista de cuentas administradoras aparece en la sección “Administradores autorizados”. Puedes eliminar otras cuentas, pero no la cuenta con la que estás dentro.",
-  "admin-overview": "Las secciones que hoy permiten acciones son la administración de perfiles y las sesiones. El resto del panel sirve como referencia de funciones que se podrían implementar más adelante.",
-  "admin-requests": "El formulario está en la página “Servicios”, debajo del catálogo. La recepción de solicitudes dentro de Admin sería una función nueva, aún no implementada.",
+  "admin-overview": "Admin permite gestionar solicitudes, editar el contenido del sitio y administrar cuentas. El asistente orienta, pero los cambios solo se guardan al confirmarlos.",
+  "admin-requests": "El formulario está en la página “Servicios”. En Admin, abre “Ver solicitudes” para revisarlas y marcarlas como atendidas.",
   "home-projects": "Puedes volver a la parte superior con “Inicio” en el menú. Los enlaces de proyecto se abren en otra pestaña.",
   "home": "Usa “Ver servicios” para ir al catálogo o baja a “Proyectos realizados” para abrir los ejemplos.",
   "home-design": "La portada describe sitios empresariales adaptables a móviles y escritorio, con la identidad visual de ProgramStyle.",
@@ -231,11 +228,11 @@ const ADMIN_HELP_FOLLOW_UPS = {
   "service-landing": "La opción de cotización de cada tarjeta está prevista en el catálogo, y el formulario general aparece más abajo en la página.",
   "service-corporate": "El precio indicado es inicial; una cotización puede precisar secciones, contenido e integraciones que requiera cada empresa.",
   "service-ecommerce": "Si tienes necesidades específicas de pagos o inventario, descríbelas en el campo de mensaje del formulario para que se consideren al cotizar.",
-  "service-ai": "Las tres opciones rápidas preparan mensajes distintos para WhatsApp. La interacción no ocurre en una conversación de IA embebida.",
-  "contact": "El formulario solicita nombre, correo y mensaje; el teléfono y el servicio son opcionales. El contacto se abre mediante WhatsApp y correo.",
-  "admin-limits": "Puedes editar el contenido compartido de Inicio y Servicios, crear cuentas y cambiar credenciales. Las solicitudes y clientes aún no tienen una bandeja de administración.",
-  "admin-clients": "La administración de clientes y conversaciones aún no está implementada; puedo ayudarte a localizar las opciones de contacto que sí existen en Servicios.",
-  "assistant": "Puedo resolver dudas usando la información del propio proyecto, pero no consulto Internet ni un modelo de IA. Si necesitas algo fuera de Admin, Inicio o Servicios, dime y trataré de orientarte con lo disponible.",
+  "service-ai": "En Servicios puedes consultar el chatbot de IA con preguntas libres. Las opciones rápidas siguen permitiendo preparar consultas para WhatsApp.",
+  "contact": "El formulario solicita nombre, correo y mensaje; el teléfono y el servicio son opcionales. Los envíos quedan registrados para que Admin los revise.",
+  "admin-limits": "Puedes revisar solicitudes, editar el contenido compartido de Inicio y Servicios, crear cuentas y cambiar credenciales. La aplicación todavía no ofrece un CRM con historial de clientes.",
+  "admin-clients": "Puedes revisar solicitudes de contacto en Admin, pero todavía no hay CRM ni historial de conversaciones.",
+  "assistant": "Uso IA para responder dudas sobre Admin, Inicio y Servicios. No ejecuto cambios por mi cuenta: prepara una propuesta y confírmala desde el panel para guardarla.",
   "local-editor": "Puedes editar títulos, descripciones, datos de proyectos, planes, precios, características, contacto y consultas rápidas. Las propuestas requieren confirmación y se guardan en el backend compartido."
 };
 

@@ -62,9 +62,9 @@ Sin credenciales, Vite puede compilar y mostrar el contenido predeterminado, per
 ## Publicar en GitHub Pages
 
 1. Sube el repositorio a GitHub en la rama `main`.
-2. En **Settings → Secrets and variables → Actions → Variables**, crea:
-   - `SUPABASE_URL`: URL del proyecto Supabase.
-   - `SUPABASE_ANON_KEY`: clave publicable/anon del proyecto. Es pública y se usa para conectar el navegador.
+2. En **Settings → Secrets and variables → Actions → Secrets**, crea:
+   - `VITE_SUPABASE_URL`: URL raíz del proyecto Supabase, sin `/rest/v1/`.
+   - `VITE_SUPABASE_ANON_KEY`: clave publicable/anon del proyecto. Es pública y se usa para conectar el navegador.
 3. En **Settings → Pages**, selecciona **GitHub Actions** como origen.
 4. Cada push a `main` construye el sitio con Vite y lo despliega. También puedes iniciarlo desde **Actions → Deploy ProgramStyle to GitHub Pages → Run workflow**.
 
