@@ -241,16 +241,35 @@ ProgramStyleContent.load().then((siteContent) => {
         const servicio = document.getElementById("servicio").value;
         const mensaje = document.getElementById("mensaje").value.trim();
 
-        const mensajeError = (texto) => {
+        const mostrarEnlacesContacto = () => {
+          const salto = document.createElement("br");
+          const whatsappLink = document.createElement("a");
+          whatsappLink.className = "btn btn-secondary form-contact-action";
+          whatsappLink.href = crearMensajeWhatsApp({ nombre, email, telefono, servicio, mensaje });
+          whatsappLink.target = "_blank";
+          whatsappLink.rel = "noopener noreferrer";
+          whatsappLink.textContent = "Continuar por WhatsApp";
+
+          const emailLink = document.createElement("a");
+          emailLink.className = "btn btn-secondary form-contact-action";
+          emailLink.href = crearMensajeCorreo({ nombre, email, telefono, servicio, mensaje });
+          emailLink.textContent = "Enviar por correo";
+
+          feedback.append(salto, whatsappLink, document.createTextNode(" "), emailLink);
+        };
+
+        const mensajeError = (texto, showContactLinks = false) => {
           feedback.classList.remove("success");
           feedback.classList.add("error");
           feedback.textContent = texto;
+          if (showContactLinks) mostrarEnlacesContacto();
         };
 
         const mensajeExito = (texto) => {
           feedback.classList.remove("error");
           feedback.classList.add("success");
           feedback.textContent = texto;
+          mostrarEnlacesContacto();
         };
 
         if (!nombre || !email || !mensaje) {
@@ -264,7 +283,10 @@ ProgramStyleContent.load().then((siteContent) => {
         }
 
         if (!supabase) {
-          mensajeError(supabaseConfigError?.message || "No se pudo conectar con el servidor de solicitudes.");
+          mensajeError(
+            supabaseConfigError?.message || "No se pudo conectar con el servidor de solicitudes.",
+            true
+          );
           return;
         }
 
@@ -277,10 +299,13 @@ ProgramStyleContent.load().then((siteContent) => {
           await invokeFunction("contact-request", {
             body: { name: nombre, email, phone: telefono, service: servicio, message: mensaje }
           });
-          mensajeExito(serviceContent.requestSentMessage);
+          mensajeExito("Tu solicitud quedó registrada en el panel Admin. Elige cómo quieres continuar:");
           form.reset();
         } catch (error) {
-          mensajeError(`No se pudo enviar tu solicitud: ${error.message}. Inténtalo de nuevo o contáctanos por WhatsApp.`);
+          mensajeError(
+            `No se pudo registrar tu solicitud: ${error.message}. Puedes continuar por uno de estos medios.`,
+            true
+          );
         } finally {
           submitButton.disabled = false;
         }

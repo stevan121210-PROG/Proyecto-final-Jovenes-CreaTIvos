@@ -117,7 +117,6 @@ import { supabase, supabaseConfigError } from "./supabase-client.js";
       requestGreeting: "Hola, quiero solicitar una cotización.",
       requestSubject: "Solicitud de cotización ProgramStyle",
       aiSentMessage: "Consulta IA enviada por WhatsApp. También puedes escribirnos por correo.",
-      requestSentMessage: "Solicitud enviada. Te estamos contactando por WhatsApp y correo.",
       requiredFieldsMessage: "Por favor completa los campos obligatorios.",
       invalidEmailMessage: "Ingresa un correo electrónico válido."
     }

@@ -280,7 +280,6 @@ const CONTENT_FIELD_LABELS = {
   "services.requestGreeting": "Servicios · saludo de la solicitud",
   "services.requestSubject": "Servicios · asunto del correo de solicitud",
   "services.aiSentMessage": "Servicios · confirmación de consulta rápida",
-  "services.requestSentMessage": "Servicios · confirmación de solicitud",
   "services.requiredFieldsMessage": "Servicios · aviso de campos obligatorios",
   "services.invalidEmailMessage": "Servicios · aviso de correo no válido"
 };

@@ -1162,6 +1162,11 @@ input:disabled {
   color: #ff9b9b;
 }
 
+.form-contact-action {
+  margin: 0.5rem 0.35rem 0 0;
+  white-space: nowrap;
+}
+
 /* Estilos responsive */
 @media (max-width: 1024px) {
   .catalogo {
