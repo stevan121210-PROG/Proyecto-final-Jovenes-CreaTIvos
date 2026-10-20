@@ -82,6 +82,14 @@ a {
   color: var(--color-accent);
 }
 
+.site-footer {
+  padding: 1.25rem 1rem;
+  border-top: 1px solid rgb(196 154 79 / 25%);
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 /* Sección Hero */
 .hero {
   min-height: calc(100vh - 90px);
