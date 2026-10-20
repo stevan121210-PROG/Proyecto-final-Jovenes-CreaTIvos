@@ -275,7 +275,7 @@ ProgramStyleContent.load().then((siteContent) => {
 
         try {
           await invokeFunction("contact-request", {
-            body: { name: nombre, email, phone: telefono, service: servicio, message }
+            body: { name: nombre, email, phone: telefono, service: servicio, message: mensaje }
           });
           mensajeExito(serviceContent.requestSentMessage);
           form.reset();
