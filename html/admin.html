@@ -45,6 +45,31 @@
 
           <button type="submit" class="btn btn-primary">Ingresar</button>
           <p id="login-error" class="auth-alert" aria-live="polite"></p>
+          <button type="button" id="show-reset-form" class="auth-link">¿Olvidaste tu contraseña?</button>
+        </form>
+
+        <form id="password-reset-form" class="auth-form hidden" novalidate>
+          <p>Escribe el correo de tu cuenta administradora. Te enviaremos un enlace para recuperar el acceso.</p>
+          <div class="input-row">
+            <label for="password-reset-email">Correo electrónico</label>
+            <input type="email" id="password-reset-email" autocomplete="email" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Enviar enlace de recuperación</button>
+          <p id="password-reset-message" class="auth-alert" aria-live="polite"></p>
+          <button type="button" id="back-to-login-from-reset" class="auth-link">Volver al inicio de sesión</button>
+        </form>
+
+        <form id="password-recovery-form" class="auth-form hidden" novalidate>
+          <div class="input-row">
+            <label for="recovery-password">Nueva contraseña</label>
+            <input type="password" id="recovery-password" autocomplete="new-password" minlength="12" required />
+          </div>
+          <div class="input-row">
+            <label for="recovery-password-confirm">Confirma la nueva contraseña</label>
+            <input type="password" id="recovery-password-confirm" autocomplete="new-password" minlength="12" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar nueva contraseña</button>
+          <p id="password-recovery-message" class="auth-alert" aria-live="polite"></p>
         </form>
       </section>
 

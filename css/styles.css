@@ -547,6 +547,17 @@ input:disabled {
   color: #9de6ad;
 }
 
+.auth-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .hidden {
   display: none;
 }

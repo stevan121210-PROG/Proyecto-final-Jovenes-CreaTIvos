@@ -3,6 +3,12 @@ import { invokeFunction, supabase, supabaseConfigError } from "./supabase-client
 
 const loginForm = document.getElementById("admin-login-form");
 const loginError = document.getElementById("login-error");
+const showResetFormButton = document.getElementById("show-reset-form");
+const passwordResetForm = document.getElementById("password-reset-form");
+const passwordResetMessage = document.getElementById("password-reset-message");
+const backToLoginFromResetButton = document.getElementById("back-to-login-from-reset");
+const passwordRecoveryForm = document.getElementById("password-recovery-form");
+const passwordRecoveryMessage = document.getElementById("password-recovery-message");
 const loginSection = document.getElementById("login-section");
 const adminDashboard = document.getElementById("admin-dashboard");
 const createAdminForm = document.getElementById("create-admin-form");
@@ -37,6 +43,7 @@ const cancelChangeBtn = document.getElementById("cancel-admin-change-btn");
 let siteContent = ProgramStyleContent.get();
 let pendingAdminChange = null;
 let currentAdmin = null;
+let isPasswordRecovery = false;
 
 let lastAdminHelpTopic = null;
 
@@ -793,6 +800,12 @@ async function initializeAdmin() {
   siteContent = await ProgramStyleContent.load();
   renderContentFieldOptions();
   updateContentFieldValue();
+  if (isPasswordRecovery) {
+    showPasswordRecoveryForm();
+    setBackendStatus("Enlace de recuperación verificado. Define una contraseña nueva.");
+    return;
+  }
+
   const contentError = ProgramStyleContent.getLoadError();
   if (contentError) {
     showLogin();
@@ -818,6 +831,26 @@ async function initializeAdmin() {
     showLogin();
     setBackendStatus(error.message, "error");
   }
+}
+
+function showPasswordRecoveryForm() {
+  isPasswordRecovery = true;
+  loginForm?.classList.add("hidden");
+  passwordResetForm?.classList.add("hidden");
+  passwordRecoveryForm?.classList.remove("hidden");
+  adminDashboard?.classList.add("hidden");
+  adminDashboard?.classList.remove("visible");
+  loginSection?.classList.remove("hidden");
+  document.getElementById("recovery-password")?.focus();
+}
+
+function showLoginForm() {
+  isPasswordRecovery = false;
+  passwordRecoveryForm?.classList.add("hidden");
+  passwordResetForm?.classList.add("hidden");
+  loginForm?.classList.remove("hidden");
+  setMessage(passwordResetMessage, "", "");
+  setMessage(passwordRecoveryMessage, "", "");
 }
 
 function setMessage(element, text, type) {
@@ -1006,6 +1039,99 @@ if (loginForm) {
     }).finally(() => {
       loginForm.querySelector("button[type='submit']").disabled = false;
     });
+  });
+}
+
+const recoveryQuery = new URLSearchParams(window.location.search);
+const recoveryHash = new URLSearchParams(window.location.hash.slice(1));
+if (recoveryQuery.get("type") === "recovery" || recoveryQuery.has("code") || recoveryHash.get("type") === "recovery") {
+  isPasswordRecovery = true;
+}
+
+if (supabase) {
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "PASSWORD_RECOVERY") showPasswordRecoveryForm();
+  });
+}
+
+if (showResetFormButton && passwordResetForm && loginForm) {
+  showResetFormButton.addEventListener("click", () => {
+    document.getElementById("password-reset-email").value = document.getElementById("usuario").value.trim();
+    passwordResetForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+    document.getElementById("password-reset-email").focus();
+  });
+}
+
+if (backToLoginFromResetButton) {
+  backToLoginFromResetButton.addEventListener("click", showLoginForm);
+}
+
+if (passwordResetForm) {
+  passwordResetForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = document.getElementById("password-reset-email").value.trim();
+    if (!email) {
+      setMessage(passwordResetMessage, "Escribe el correo de tu cuenta administradora.", "error");
+      document.getElementById("password-reset-email").focus();
+      return;
+    }
+    if (!supabase) {
+      setMessage(passwordResetMessage, supabaseConfigError?.message || "Supabase no está configurado.", "error");
+      return;
+    }
+
+    const submitButton = passwordResetForm.querySelector("button[type='submit']");
+    submitButton.disabled = true;
+    setMessage(passwordResetMessage, "Enviando el enlace de recuperación...", "");
+    try {
+      const redirectTo = new URL(`${import.meta.env.BASE_URL}admin.html`, window.location.origin).toString();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      setMessage(passwordResetMessage, "Si el correo corresponde a una cuenta, recibirás un enlace para cambiar la contraseña. Revisa también Spam.", "success");
+    } catch (error) {
+      setMessage(passwordResetMessage, `No se pudo enviar el enlace: ${error.message}`, "error");
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+
+if (passwordRecoveryForm) {
+  passwordRecoveryForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const password = document.getElementById("recovery-password").value;
+    const confirmation = document.getElementById("recovery-password-confirm").value;
+    if (password.length < 12) {
+      setMessage(passwordRecoveryMessage, "La contraseña debe tener al menos 12 caracteres.", "error");
+      return;
+    }
+    if (password !== confirmation) {
+      setMessage(passwordRecoveryMessage, "Las contraseñas no coinciden.", "error");
+      return;
+    }
+    if (!supabase) {
+      setMessage(passwordRecoveryMessage, supabaseConfigError?.message || "Supabase no está configurado.", "error");
+      return;
+    }
+
+    const submitButton = passwordRecoveryForm.querySelector("button[type='submit']");
+    submitButton.disabled = true;
+    setMessage(passwordRecoveryMessage, "Actualizando la contraseña...", "");
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+      showLoginForm();
+      setMessage(loginError, "Contraseña actualizada. Ya puedes iniciar sesión con la nueva contraseña.", "success");
+      setBackendStatus("Contraseña actualizada correctamente.", "success");
+      passwordRecoveryForm.reset();
+    } catch (error) {
+      setMessage(passwordRecoveryMessage, `No se pudo actualizar la contraseña: ${error.message}`, "error");
+    } finally {
+      submitButton.disabled = false;
+    }
   });
 }
 

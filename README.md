@@ -33,14 +33,21 @@ Sin credenciales, Vite puede compilar y mostrar el contenido predeterminado, per
    on conflict (id) do nothing;
    ```
 
-4. Instala la CLI de Supabase, autentícate y vincula el proyecto:
+4. En **Authentication → URL Configuration**, establece como **Site URL** la dirección raíz `https://TU_USUARIO.github.io/TU_REPOSITORIO/` y agrega estas **Redirect URLs**:
+   - `https://TU_USUARIO.github.io/TU_REPOSITORIO/admin.html`
+   - `http://127.0.0.1:5173/admin.html`
+   - `http://localhost:5173/admin.html`
+
+   Para ProgramStyle publicado en este repositorio, la URL de Admin es `https://stevan121210-prog.github.io/Proyecto-final-Jovenes-CreaTIvos/admin.html`. El panel tiene un enlace de recuperación y permite establecer una contraseña nueva después de verificar el enlace recibido por correo.
+
+5. Instala la CLI de Supabase, autentícate y vincula el proyecto:
 
    ```powershell
    npx supabase login
    npx supabase link --project-ref TU_PROJECT_REF
    ```
 
-5. Configura secretos de las Edge Functions. `ALLOWED_ORIGINS` debe contener los orígenes separados por coma, sin rutas. Incluye el dominio `https://TU_USUARIO.github.io` y los orígenes locales `http://127.0.0.1:5173,http://localhost:5173`.
+6. Configura secretos de las Edge Functions. `ALLOWED_ORIGINS` debe contener los orígenes separados por coma, sin rutas. Incluye el dominio `https://TU_USUARIO.github.io` y los orígenes locales `http://127.0.0.1:5173,http://localhost:5173`.
 
    ```powershell
    npx supabase secrets set OPENAI_API_KEY=TU_CLAVE_OPENAI ALLOWED_ORIGINS="https://TU_USUARIO.github.io,http://127.0.0.1:5173,http://localhost:5173"
@@ -48,7 +55,7 @@ Sin credenciales, Vite puede compilar y mostrar el contenido predeterminado, per
 
    Supabase proporciona `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` a las funciones. Nunca publiques la clave de OpenAI ni la clave service role en el frontend o en GitHub Pages.
 
-6. Despliega cada función desde la raíz del repositorio:
+7. Despliega cada función desde la raíz del repositorio:
 
    ```powershell
    npx supabase functions deploy ai-chat
