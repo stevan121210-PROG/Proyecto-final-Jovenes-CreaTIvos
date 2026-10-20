@@ -17,12 +17,19 @@ ProgramStyleContent.load().then((siteContent) => {
 
   function crearMensajeWhatsApp({ nombre, email, telefono, servicio, mensaje }) {
     const resumen = [
-      serviceContent.requestGreeting,
-      `Nombre: ${nombre}`,
-      `Correo: ${email}`,
-      telefono ? `Teléfono: ${telefono}` : "Teléfono: No indicado",
-      servicio ? `Servicio: ${servicio}` : "Servicio: No especificado",
-      `Mensaje: ${mensaje}`
+      `👋 ${serviceContent.requestGreeting}`,
+      "✨ Me gustaría recibir información para mi proyecto.",
+      "",
+      "📋 *Mis datos:*",
+      `👤 Nombre: ${nombre}`,
+      `📧 Correo: ${email}`,
+      telefono ? `📱 Teléfono: ${telefono}` : "📱 Teléfono: No indicado",
+      servicio ? `💻 Servicio: ${servicio}` : "💻 Servicio: No especificado",
+      "",
+      "💬 *Mi solicitud:*",
+      mensaje,
+      "",
+      "¡Gracias! Quedo pendiente. 🙌"
     ].join("\n");
 
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(resumen)}`;
