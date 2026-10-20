@@ -14,19 +14,26 @@ ProgramStyleContent.load().then((content) => {
   document.getElementById("home-projects-description").textContent = homeContent.projectsDescription;
 
   const projectGrid = document.getElementById("home-project-grid");
+  const getProjectUrl = (value) => {
+    if (/^(?:https?:)?\/\//i.test(value)) return value;
+    const relativePath = value.replace(/^(?:\.\.\/|\/)+/, "");
+    return `${SITE_BASE_PATH}${relativePath}`;
+  };
+  const getProjectImageUrl = (value) => {
+    if (/^(?:https?:)?\/\//i.test(value)) return value;
+    const relativePath = value.replace(/^(?:\.\.\/|\/)*assets\//i, "");
+    return `${SITE_BASE_PATH}${relativePath}`;
+  };
+
   homeContent.projects.forEach((project) => {
     const card = document.createElement("a");
-    card.href = /^https?:\/\//i.test(project.url)
-      ? project.url
-      : `${SITE_BASE_PATH}${project.url.replace(/^(?:\.\.\/|\/)+/, "")}`;
+    card.href = getProjectUrl(project.url);
     card.target = "_blank";
     card.rel = "noreferrer";
     card.className = "project-card";
 
     const image = document.createElement("img");
-    image.src = /^https?:\/\//i.test(project.image)
-      ? project.image
-      : `${SITE_BASE_PATH}${project.image.replace(/^(?:\.\.\/|\/)+/, "")}`;
+    image.src = getProjectImageUrl(project.image);
     image.alt = project.alt;
 
     const info = document.createElement("div");
