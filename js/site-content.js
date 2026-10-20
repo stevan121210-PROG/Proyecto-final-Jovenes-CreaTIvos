@@ -38,7 +38,8 @@ import { supabase, supabaseConfigError } from "./supabase-client.js";
             "Diseño responsive para móviles y escritorio",
             "Sección de contacto con formulario",
             "Optimización básica SEO",
-            "Integración con WhatsApp para clientes"
+            "Integración con WhatsApp para clientes",
+            "Contrata una Landing Page y recibe 25% de descuento en tu siguiente proyecto con ProgramStyle."
           ],
           observation: "Ideal para presentar tu empresa con presencia profesional en línea."
         },
@@ -52,16 +53,6 @@ import { supabase, supabaseConfigError } from "./supabase-client.js";
             "Panel de administración básico"
           ],
           observation: "Perfecto para empresas que necesitan una presencia digital sólida y escalable."
-        },
-        {
-          name: "Descuento especial Landing",
-          price: "25% de descuento en tu siguiente proyecto",
-          features: [
-            "Contrata una Landing Page hoy",
-            "Recibe 25% de descuento en tu próximo proyecto",
-            "Oferta válida para proyectos posteriores con ProgramStyle"
-          ],
-          observation: "Promoción exclusiva: primero una Landing Page y luego un gran ahorro en el siguiente desarrollo."
         },
         {
           name: "E-commerce",
@@ -158,6 +149,16 @@ import { supabase, supabaseConfigError } from "./supabase-client.js";
           ? "Recibe 25% de descuento en tu próximo proyecto"
           : feature
       );
+
+      const landingPlan = content.services.packages.find((plan) => plan.name === "Landing Page");
+      if (landingPlan) {
+        const promotion = "Contrata una Landing Page y recibe 25% de descuento en tu siguiente proyecto con ProgramStyle.";
+        const hasPromotion = landingPlan.features.some((feature) =>
+          /25%\s+de descuento/i.test(feature) && /(siguiente|pr[oó]ximo)\s+proyecto/i.test(feature)
+        );
+        if (!hasPromotion) landingPlan.features.push(promotion);
+        content.services.packages = content.services.packages.filter((plan) => plan !== discountPlan);
+      }
     }
 
     const maintenancePlan = DEFAULT_CONTENT.services.packages.find((plan) => plan.name === "Mantenimiento Web");

@@ -144,8 +144,8 @@ const ADMIN_HELP_TOPICS = [
     id: "service-discount",
     keywords: ["descuento", "promocion", "25%", "oferta"],
     responses: [
-      "En “Servicios” aparece una promoción de 25% de descuento para un proyecto posterior, después de contratar una Landing Page. La descripción la presenta como una oferta para proyectos posteriores con ProgramStyle; confirma las condiciones al cotizar.",
-      "La promoción publicada es 25% de descuento en el siguiente proyecto al contratar primero una Landing Page. Como los precios y condiciones pueden variar, lo mejor es confirmarlo al solicitar la cotización."
+      "La Landing Page incluye una promoción de 25% de descuento en tu siguiente proyecto con ProgramStyle. La oferta aparece dentro de la misma tarjeta del plan; confirma las condiciones al cotizar.",
+      "Al contratar una Landing Page, obtienes 25% de descuento en tu siguiente proyecto con ProgramStyle. Encontrarás esta promoción en la tarjeta de Landing Page."
     ]
   },
   {
@@ -229,7 +229,7 @@ const ADMIN_HELP_FOLLOW_UPS = {
   "home-projects": "Puedes volver a la parte superior con “Inicio” en el menú. Los enlaces de proyecto se abren en otra pestaña.",
   "home": "Usa “Ver servicios” para ir al catálogo o baja a “Proyectos realizados” para abrir los ejemplos.",
   "home-design": "La portada describe sitios empresariales adaptables a móviles y escritorio, con la identidad visual de ProgramStyle.",
-  "service-discount": "Encontrarás la oferta como una tarjeta propia en el catálogo de Servicios. Para saber si aplica a un caso concreto, envía el formulario de cotización.",
+  "service-discount": "La promoción del 25% está incluida dentro de la tarjeta de Landing Page. Para confirmar las condiciones, envía el formulario de cotización.",
   "service-overview": "El catálogo está en la página “Servicios”, debajo del encabezado. Las tarjetas incluyen características, precio de referencia y acceso a cotización.",
   "service-prices": "Los precios son valores de partida, no tarifas garantizadas: el texto del catálogo indica que pueden variar según urgencia, integraciones de IA y detalle del proyecto.",
   "service-landing": "La opción de cotización de cada tarjeta está prevista en el catálogo, y el formulario general aparece más abajo en la página.",
@@ -515,7 +515,10 @@ function getRequestedContentChange(question) {
   const selectedPackageIndex = siteContent.services.packages.findIndex((pack) => {
     const name = normaliseChatText(pack.name);
     if (normalisedQuestion.includes(name)) return true;
-    if (name.includes("landing") && /\blanding\b/.test(normalisedQuestion)) return true;
+    if (name.includes("landing") && (
+      /\blanding\b/.test(normalisedQuestion) ||
+      /\b(descuento|promocion|oferta)\b/.test(normalisedQuestion)
+    )) return true;
     if (name.includes("corporativo") && /\b(corporativo|empresa)\b/.test(normalisedQuestion)) return true;
     if (name.includes("e commerce") && /\b(e commerce|tienda en linea|tienda online)\b/.test(normalisedQuestion)) return true;
     return name.includes("descuento") && /\b(descuento|promocion|oferta)\b/.test(normalisedQuestion);
@@ -531,13 +534,15 @@ function getRequestedContentChange(question) {
           : "description";
     path = `home.projects.${selectedProjectIndex}.${property}`;
   } else if (selectedPackageIndex >= 0) {
-    const property = /\b(precio|valor|costo)\b/.test(normalisedQuestion)
-      ? "price"
-      : /\b(caracteristica|incluye|incluyen|beneficio)\b/.test(normalisedQuestion)
-        ? "features"
-        : /\b(nombre|titulo)\b/.test(normalisedQuestion)
-          ? "name"
-          : "observation";
+    const property = /\b(descuento|promocion|oferta)\b/.test(normalisedQuestion)
+      ? "features"
+      : /\b(precio|valor|costo)\b/.test(normalisedQuestion)
+        ? "price"
+        : /\b(caracteristica|incluye|incluyen|beneficio)\b/.test(normalisedQuestion)
+          ? "features"
+          : /\b(nombre|titulo)\b/.test(normalisedQuestion)
+            ? "name"
+            : "observation";
     path = `services.packages.${selectedPackageIndex}.${property}`;
   } else if (/\b(correo|email)\b/.test(normalisedQuestion)) {
     path = "services.email";
@@ -610,14 +615,14 @@ function getDynamicAdminHelpResponse(topic) {
   }
 
   const packageIndexByTopic = {
-    "service-landing": 0,
-    "service-corporate": 1,
-    "service-discount": 2,
-    "service-ecommerce": 3
+    "service-landing": "Landing Page",
+    "service-corporate": "Sitio Corporativo",
+    "service-discount": "Landing Page",
+    "service-ecommerce": "E-commerce"
   };
-  const packageIndex = packageIndexByTopic[topic.id];
-  if (packageIndex !== undefined && packages[packageIndex]) {
-    const selectedPackage = packages[packageIndex];
+  const packageName = packageIndexByTopic[topic.id];
+  const selectedPackage = packages.find(({ name }) => name === packageName);
+  if (selectedPackage) {
     const features = selectedPackage.features.join("; ");
     return `${selectedPackage.name}: ${selectedPackage.price}. ${selectedPackage.observation} Incluye: ${features}.`;
   }
@@ -904,7 +909,7 @@ function getAdminHelpResponse(question) {
   ) {
     lastAdminHelpTopic = "local-editor";
     if (/\b(precio|valor|costo)\b/.test(normalisedQuestion)) {
-      return "¿De cuál plan quieres cambiar el precio: Landing Page, Sitio Corporativo, promoción o E-commerce? Indica también el valor nuevo y te prepararé la vista previa.";
+      return "¿De cuál plan quieres cambiar el precio: Landing Page, Sitio Corporativo, E-commerce o Mantenimiento Web? Indica también el valor nuevo y te prepararé la vista previa.";
     }
     return "¡Dale! Dime el dato y su nuevo valor, por ejemplo: “Cambia el título de Inicio a Sitios para crecer”. También puedes elegir cualquier campo en “Preparar un cambio del sitio”. Primero verás la propuesta; solo se guarda al confirmarla.";
   }
