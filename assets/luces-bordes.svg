@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 1000" fill="none">
+  <defs>
+    <linearGradient id="gold" x1="20" y1="0" x2="160" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5d77d" stop-opacity=".12"/>
+      <stop offset=".25" stop-color="#d59b32" stop-opacity=".8"/>
+      <stop offset=".55" stop-color="#ffe7a0"/>
+      <stop offset=".82" stop-color="#b87922" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#f5d77d" stop-opacity=".12"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-10%" width="200%" height="120%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+  <g stroke="url(#gold)" stroke-linecap="round">
+    <path d="M18-30C42 75 15 125 42 206s-5 132 25 214-7 136 22 221 2 155 34 241 8 126 43 161" stroke-width="2.2" opacity=".42" filter="url(#glow)"/>
+    <path d="M18-30C42 75 15 125 42 206s-5 132 25 214-7 136 22 221 2 155 34 241 8 126 43 161" stroke-width="1.15" opacity=".76"/>
+    <path d="M104-20C76 83 128 162 97 260s29 146-3 243 15 164-17 250 5 157-26 275" stroke-width="1.5" opacity=".72"/>
+    <path d="M-5 385c40 30 47 70 78 98m-63 29c35 22 51 58 82 81m-77 43c27 17 43 44 70 65" stroke-width="1.3" opacity=".62"/>
+    <path d="M142 35v111m-3 546v164" stroke-width="1" opacity=".45"/>
+  </g>
+  <g fill="#ffe7a0">
+    <path d="M82 176l3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9Z" opacity=".9"/>
+    <circle cx="45" cy="331" r="2.2"/>
+    <path d="M126 458l2.5 7.5 7.5 2.5-7.5 2.5-2.5 7.5-2.5-7.5-7.5-2.5 7.5-2.5 2.5-7.5Z" opacity=".8"/>
+    <circle cx="76" cy="686" r="1.8"/>
+    <path d="M150 824l2.5 7.5 7.5 2.5-7.5 2.5-2.5 7.5-2.5-7.5-7.5-2.5 7.5-2.5 2.5-7.5Z" opacity=".85"/>
+  </g>
+</svg>
