@@ -35,6 +35,8 @@ ProgramStyleContent.load().then((content) => {
     const image = document.createElement("img");
     image.src = getProjectImageUrl(project.image);
     image.alt = project.alt;
+    image.loading = "lazy";
+    image.decoding = "async";
 
     const info = document.createElement("div");
     info.className = "project-info";

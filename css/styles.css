@@ -38,7 +38,6 @@ body::after {
   background-position: center;
   background-size: 100% 100%;
   opacity: 0.72;
-  filter: drop-shadow(0 0 5px rgb(226 178 69 / 38%));
   animation: edge-light-glow 5s ease-in-out infinite alternate;
 }
 
@@ -60,12 +59,10 @@ body > * {
 @keyframes edge-light-glow {
   from {
     opacity: 0.52;
-    filter: drop-shadow(0 0 3px rgb(226 178 69 / 25%));
   }
 
   to {
     opacity: 0.82;
-    filter: drop-shadow(0 0 9px rgb(226 178 69 / 55%));
   }
 }
 
@@ -74,6 +71,7 @@ body > * {
   body::after {
     width: 14vw;
     opacity: 0.42;
+    animation: none;
   }
 }
 
@@ -95,13 +93,13 @@ a {
 }
 
 .container {
-  width: min(1120px, 100% - 2rem);
+  width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
 }
 
 /* Estilos del encabezado */
 .site-header {
-  padding: 2.5rem 0 1rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem) 0 1rem;
 }
 
 .header-inner {
@@ -114,7 +112,7 @@ a {
 }
 
 .brand-logo img {
-  width: 240px;
+  width: clamp(160px, 20vw, 240px);
   height: auto;
 }
 
@@ -137,6 +135,11 @@ a {
 }
 
 .main-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.45rem 0.65rem;
   color: var(--color-text);
   font-weight: 500;
 }
@@ -1139,7 +1142,7 @@ input:disabled {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 2rem;
 }
 
@@ -1235,7 +1238,13 @@ input:disabled {
 
 .form-contact-action {
   margin: 0.5rem 0.35rem 0 0;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 3px;
 }
 
 /* Estilos responsive */
@@ -1243,27 +1252,50 @@ input:disabled {
   .catalogo {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
 }
 
 @media (max-width: 768px) {
   .header-inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .main-nav ul {
-    flex-direction: column;
-    gap: 0.85rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .brand-logo img {
+    width: clamp(145px, 34vw, 190px);
   }
 
   .hero {
-    padding: 2rem 0;
+    min-height: auto;
+    padding: clamp(3rem, 10vw, 5rem) 0;
   }
 
   .catalogo {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-header,
@@ -1279,5 +1311,109 @@ input:disabled {
 
   .admin-chat-input-row {
     flex-direction: column;
+  }
+
+  .auth-card,
+  .admin-dashboard,
+  .panel-section,
+  .contact-info,
+  .contact-form,
+  .ai-asistencia {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: min(100% - 1.5rem, 1120px);
+  }
+
+  .site-header {
+    padding-top: 1rem;
+  }
+
+  .main-nav ul {
+    gap: 0;
+  }
+
+  .main-nav a {
+    padding-inline: 0.55rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 9vw, 3rem);
+    line-height: 1.15;
+  }
+
+  .hero-text {
+    font-size: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(100%, 22rem);
+    margin-inline: auto;
+  }
+
+  .project-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .proyectos {
+    padding: 3rem 0;
+  }
+
+  .catalogo-page {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .page-header {
+    padding-top: 1.5rem;
+  }
+
+  .catalog-card {
+    padding: 1.25rem;
+    border-radius: 18px;
+  }
+
+  .ai-asistencia {
+    border-radius: 18px;
+  }
+
+  .contacto-page {
+    margin-top: 1.5rem;
+    padding: 1.5rem 0;
+  }
+
+  .contact-info,
+  .contact-form {
+    padding: 1.25rem;
+    border-radius: 18px;
+  }
+
+  .admin-chat-input-row {
+    gap: 0.75rem;
+  }
+
+  .admin-chat-input-row .btn {
+    width: 100%;
+  }
+
+  .admin-status {
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .btn {
+    padding: 0.8rem 1.15rem;
+  }
+
+  .assistant-suggestions .ai-option {
+    flex: 1 1 100%;
+    border-radius: 12px;
+    text-align: left;
   }
 }
