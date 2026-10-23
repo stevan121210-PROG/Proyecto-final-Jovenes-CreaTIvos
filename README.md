@@ -77,6 +77,18 @@ Sin credenciales, Vite puede compilar y mostrar el contenido predeterminado, per
 
 El workflow configura la ruta base tanto para un repositorio de proyecto (`https://TU_USUARIO.github.io/NOMBRE_REPO/`) como para el repositorio principal de usuario (`https://TU_USUARIO.github.io/`).
 
+## Preparación para Vercel
+
+El repositorio incluye una configuración inicial para alojar el sitio de Vite en Vercel y una función de comprobación en `/api/health`. Esta ruta solo confirma que la función de Vercel responde; no prueba la conexión con Supabase.
+
+1. Importa el repositorio en Vercel y conserva la raíz del proyecto.
+2. Configura `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en las variables de entorno de Vercel para Preview y Production.
+3. Despliega con el comando `npm run build` y el directorio de salida `dist` (ya declarados en `vercel.json`).
+4. Comprueba la función en `https://TU_DOMINIO/api/health`.
+5. Cuando uses un dominio Vercel, añádelo a `ALLOWED_ORIGINS` en los secretos de Supabase para que sus Edge Functions acepten solicitudes desde ese origen.
+
+Esta preparación no traslada autenticación, solicitudes ni asistentes a funciones de Vercel: el frontend continúa usando Supabase y las funciones existentes en `supabase/functions`. La clave `SUPABASE_SERVICE_ROLE_KEY` y `OPENAI_API_KEY` deben permanecer en los secretos de Supabase; nunca deben configurarse como variables `VITE_*`.
+
 ## Funcionalidad y límites
 
 - El formulario de Servicios registra solicitudes en `contact_requests`; las cuentas autorizadas las revisan en Admin y pueden marcarlas como atendidas.
